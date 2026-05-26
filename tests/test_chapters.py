@@ -163,6 +163,8 @@ def test_ch09_load_documents_uses_first_text_line_as_title():
 
     assert by_id["chapter09-rag-basics"].metadata["title"] == "Chapter 09 RAG Basics"
     assert by_id["chapter06-graph"].metadata["title"] == "Chapter 06 Graph"
+    assert by_id["chapter04-tool-calling"].metadata["title"] == "Chapter 04 Tool Calling"
+    assert by_id["chapter07-streaming"].metadata["title"] == "Chapter 07 Streaming"
 
 
 def test_ch09_korean_callback_question_prioritizes_callback_and_rag_docs():
@@ -175,6 +177,27 @@ def test_ch09_korean_callback_question_prioritizes_callback_and_rag_docs():
         "chapter08-callback-observability",
         "chapter09-rag-basics",
     ]
+
+
+def test_ch09_extra_rag_examples_cover_tool_calling_and_streaming():
+    docs = load_documents(Path("testdata/docs/ch09-rag"))
+    retriever = InMemoryKeywordRetriever(docs)
+
+    cases = [
+        (
+            "tool calling calculator schema safe arithmetic",
+            "chapter04-tool-calling",
+        ),
+        (
+            "streaming chunk final answer user interface",
+            "chapter07-streaming",
+        ),
+    ]
+
+    for question, expected_id in cases:
+        retrieved = retriever.retrieve(question)
+        assert retrieved, question
+        assert retrieved[0].id == expected_id
 
 
 def test_integration_flag_example_is_opt_in():

@@ -489,7 +489,11 @@ flowchart TD
 
 ```bash
 uv run python examples/ch09_rag.py "Chapter 8 callback은 RAG에서 어떤 흐름을 관찰하나요?"
+uv run python examples/ch09_rag.py "tool calling calculator schema safe arithmetic"
+uv run python examples/ch09_rag.py "streaming chunk final answer user interface"
 ```
+
+위 세 질문은 각각 callback observability, tool calling, streaming 문서가 retrieved sources에 어떻게 잡히는지 비교하기 좋습니다.
 
 테스트 명령:
 

@@ -29,8 +29,10 @@ def main() -> None:
         ],
         matters="RAG는 model의 기억에만 의존하지 않고 어떤 문서를 근거로 답했는지 sources와 함께 확인하게 해 줍니다.",
         try_next=[
-            '사용자가 물어본 callback 질문을 실행해 보세요: uv run python examples/ch09_rag.py "Chapter 8 callback은 RAG에서 어떤 흐름을 관찰하나요?"',
-            "retrieved sources의 score를 보며 왜 Chapter 08과 Chapter 09가 선택되는지 확인해 보세요.",
+            'callback 질문: uv run python examples/ch09_rag.py "Chapter 8 callback은 RAG에서 어떤 흐름을 관찰하나요?"',
+            'tool calling 질문: uv run python examples/ch09_rag.py "tool calling calculator schema safe arithmetic"',
+            'streaming 질문: uv run python examples/ch09_rag.py "streaming chunk final answer user interface"',
+            "retrieved sources의 score를 보며 어떤 문서가 선택되는지 확인해 보세요.",
         ],
     )
     print(f"question: {question}")
