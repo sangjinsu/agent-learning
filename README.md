@@ -1,6 +1,6 @@
 # agent-learning
 
-Python, LangChain, LangGraph로 agent 애플리케이션의 기본 구성 요소를 단계별로 익히는 학습 저장소입니다. Go와 CloudWeGo Eino로 작성된 `../eino-learning`의 Chapter 01-09 학습 흐름을 Python 생태계에 맞춰 옮겼습니다.
+각 chapter는 실행 가능한 CLI 예제와 pytest로 agent 애플리케이션의 기본 흐름을 확인하는 학습 저장소입니다.
 
 처음에는 외부 LLM API 없이 fake model과 local testdata로 구조와 테스트 방법을 먼저 익힙니다. 실제 OpenAI 호출은 `RUN_AGENT_LEARNING_INTEGRATION=1`을 명시했을 때만 opt-in으로 실행합니다.
 
@@ -43,6 +43,7 @@ examples/
   ch08_callback_observability.py
   ch09_rag.py
 src/agent_learning/
+  example_support.py
   fake.py
   llm/
     prompting.py
@@ -58,19 +59,25 @@ src/agent_learning/
     calculator.py
 tests/
   test_chapters.py
+  test_examples.py
   test_openai_integration.py
 testdata/
   docs/ch09-rag/
 ```
 
-Python판의 주요 대응 관계:
+핵심 구성 요소:
 
-- Eino `ChatModel` -> LangChain chat model `invoke`/`stream`
-- Eino `ChatTemplate` -> LangChain `ChatPromptTemplate`
-- Eino `WithTools` -> LangChain `bind_tools`
-- Eino `ToolsNode` -> local tool execution loop + `ToolMessage`
-- Eino `Graph` -> LangGraph `StateGraph`
-- Eino `Retriever` -> `InMemoryKeywordRetriever`
+- Chat model: `invoke()`와 `stream()`을 통해 답변 또는 chunk를 반환합니다.
+- Prompt template: `ChatPromptTemplate`으로 system/history/user message를 구성합니다.
+- Tool calling: `bind_tools()`와 allowlist 기반 tool execution loop를 사용합니다.
+- Graph: LangGraph `StateGraph`로 route, calculator, prompt, model node를 연결합니다.
+- Retriever: `InMemoryKeywordRetriever`가 local 문서를 검색하고 source metadata를 유지합니다.
+
+## Detailed CLI Trace
+
+모든 chapter 예제는 단순한 답변 한 줄 대신 학습용 trace를 출력합니다. 공통적으로 `mode:`를 먼저 보여 주고, chapter 성격에 따라 input variables, prompt messages, tool calls, graph route, stream chunks, callback events, retrieved sources, final answer를 단계별로 출력합니다.
+
+Chapter 03-09는 OpenAI 설정을 읽지만 기본 실행에서는 fake fallback을 사용합니다. 실제 API 호출은 `RUN_AGENT_LEARNING_INTEGRATION=1`과 `OPENAI_API_KEY`가 모두 있을 때만 실행되며, 출력에는 API key 값이 절대 포함되지 않습니다.
 
 ## Environment
 
@@ -80,8 +87,10 @@ Python판의 주요 대응 관계:
 OPENAI_API_KEY=your-api-key
 OPENAI_MODEL=gpt-4.1-mini
 OPENAI_BASE_URL=
-RUN_AGENT_LEARNING_INTEGRATION=1
+RUN_AGENT_LEARNING_INTEGRATION=0
 ```
+
+실제 OpenAI 호출을 실행할 때만 `RUN_AGENT_LEARNING_INTEGRATION=1`로 바꿉니다.
 
 설정 우선순위:
 
@@ -165,7 +174,7 @@ uv run pytest tests/test_chapters.py::test_ch02_prompt_formats_system_history_an
 - `src/agent_learning/llm/openai.py`는 `OpenAIConfig`, `load_config_from_env()`, `new_chat_model()`을 제공합니다.
 - 기본 모델명은 `.env.example`과 같은 `gpt-4.1-mini`입니다.
 - unit test는 API를 호출하지 않고, integration test만 opt-in으로 실제 OpenAI API를 호출합니다.
-- `examples/ch03_openai_chatmodel.py`는 integration flag가 없으면 API 호출 없이 안내 후 종료합니다.
+- `examples/ch03_openai_chatmodel.py`는 integration flag가 없으면 API 호출 없이 fake fallback trace를 출력합니다.
 
 기본 실행 명령:
 
@@ -391,7 +400,7 @@ RUN_AGENT_LEARNING_INTEGRATION=1 uv run pytest tests/test_openai_integration.py:
 핵심 개념:
 
 - Callback은 component 실행 전후와 error 시점에 호출되는 관찰 hook입니다.
-- Python판은 Eino callback API를 그대로 복제하는 대신 학습용 `CallbackRecorder`로 같은 관찰 개념을 보여줍니다.
+- Python판은 framework callback API 전체를 복제하는 대신 학습용 `CallbackRecorder`로 관찰 개념을 보여줍니다.
 - Callback은 답변을 대신 만들지 않고 옆에서 start/end/error event를 기록합니다.
 - Unit test는 fake model로 event 순서를 검증하고, integration test는 실제 OpenAI ChatModel로 실행합니다.
 

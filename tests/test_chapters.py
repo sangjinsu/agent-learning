@@ -38,7 +38,7 @@ def test_ch02_prompt_formats_system_history_and_question():
 
 
 def test_ch03_config_prefers_environment_and_disables_integration_by_default(monkeypatch):
-    monkeypatch.delenv("RUN_AGENT_LEARNING_INTEGRATION", raising=False)
+    monkeypatch.setenv("RUN_AGENT_LEARNING_INTEGRATION", "0")
     monkeypatch.setenv("OPENAI_API_KEY", "env-key")
     monkeypatch.setenv("OPENAI_MODEL", "env-model")
     monkeypatch.setenv("OPENAI_BASE_URL", "https://example.invalid/v1")
@@ -53,15 +53,17 @@ def test_ch03_config_prefers_environment_and_disables_integration_by_default(mon
 
 def test_ch03_example_is_opt_in_and_safe_without_api_key(monkeypatch, capsys):
     example = _load_example("ch03_openai_chatmodel.py")
-    monkeypatch.delenv("RUN_AGENT_LEARNING_INTEGRATION", raising=False)
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.setenv("RUN_AGENT_LEARNING_INTEGRATION", "0")
+    monkeypatch.setenv("OPENAI_API_KEY", "")
     monkeypatch.setattr(sys, "argv", ["ch03_openai_chatmodel.py", "What does ChatOpenAI do?"])
 
     example.main()
 
     output = capsys.readouterr().out
+    assert "mode: fake" in output
     assert "OpenAI integration is disabled." in output
     assert "RUN_AGENT_LEARNING_INTEGRATION=1" in output
+    assert "final answer: Fake OpenAI-style answer from chapter 03." in output
 
 
 def test_ch04_calculator_supports_safe_arithmetic_and_rejects_calls():
@@ -161,6 +163,18 @@ def test_ch09_load_documents_uses_first_text_line_as_title():
 
     assert by_id["chapter09-rag-basics"].metadata["title"] == "Chapter 09 RAG Basics"
     assert by_id["chapter06-graph"].metadata["title"] == "Chapter 06 Graph"
+
+
+def test_ch09_korean_callback_question_prioritizes_callback_and_rag_docs():
+    docs = load_documents(Path("testdata/docs/ch09-rag"))
+    retriever = InMemoryKeywordRetriever(docs)
+
+    retrieved = retriever.retrieve("Chapter 8 callback은 RAG에서 어떤 흐름을 관찰하나요?")
+
+    assert [doc.id for doc in retrieved] == [
+        "chapter08-callback-observability",
+        "chapter09-rag-basics",
+    ]
 
 
 def test_integration_flag_example_is_opt_in():

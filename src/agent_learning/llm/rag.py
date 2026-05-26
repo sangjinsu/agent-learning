@@ -126,16 +126,54 @@ def _score_document(query_weights: dict[str, int], doc: Document) -> int:
     return sum(weight * doc_weights.get(token, 0) for token, weight in query_weights.items())
 
 
+_STOPWORDS = {"chapter", "does", "what", "when", "where", "which", "with", "from", "into", "about", "어떤"}
+_KOREAN_SUFFIXES = ("하나요", "인가요", "에서", "으로", "에게", "에는", "부터", "까지", "은", "는", "이", "가", "을", "를", "로", "에", "과", "와", "요")
+_TOKEN_ALIASES = {
+    "callback": ("observability", "event", "events"),
+    "관찰": ("observability", "record", "records", "event", "events"),
+    "흐름": ("flow", "pipeline", "lifecycle"),
+    "rag": ("retrieval", "retrieve", "retrieved", "context", "source", "sources"),
+}
+
+
 def _token_weights(text: str) -> dict[str, int]:
     weights: dict[str, int] = {}
-    for token in re.split(r"[^0-9A-Za-z가-힣]+", text.lower()):
-        normalized = _normalize_token(token)
-        if normalized:
-            weights[normalized] = weights.get(normalized, 0) + 1
+    for raw_token in re.split(r"[^0-9A-Za-z가-힣]+", text.lower()):
+        for token in _expand_raw_token(raw_token):
+            weights[token] = weights.get(token, 0) + 1
     return weights
 
 
+def _expand_raw_token(raw_token: str) -> list[str]:
+    expanded: list[str] = []
+    normalized = _normalize_token(raw_token)
+    if normalized:
+        expanded.extend(_expand_normalized_token(normalized))
+
+    match = re.fullmatch(r"([a-z]+)(\d+)", raw_token)
+    if match:
+        expanded.extend(_expand_normalized_token(match.group(2)))
+
+    return list(dict.fromkeys(expanded))
+
+
+def _expand_normalized_token(token: str) -> list[str]:
+    if token in _STOPWORDS:
+        return []
+    tokens = [token]
+    if token.isdigit():
+        number = int(token)
+        tokens.extend([str(number), f"{number:02d}"])
+    tokens.extend(_TOKEN_ALIASES.get(token, ()))
+    return list(dict.fromkeys(item for item in tokens if item and item not in _STOPWORDS))
+
+
 def _normalize_token(token: str) -> str:
+    if not token:
+        return ""
+    if token.isdigit():
+        return str(int(token))
+    token = _strip_korean_suffix(token)
     if len(token) <= 2:
         return ""
     if token.endswith("ies") and len(token) > 4:
@@ -144,6 +182,13 @@ def _normalize_token(token: str) -> str:
         return token[:-2]
     if token.endswith("s") and len(token) > 3:
         return token[:-1]
+    return token
+
+
+def _strip_korean_suffix(token: str) -> str:
+    for suffix in _KOREAN_SUFFIXES:
+        if token.endswith(suffix) and len(token) > len(suffix) + 1:
+            return token[: -len(suffix)]
     return token
 
 
