@@ -75,7 +75,14 @@ testdata/
 
 ## Detailed CLI Trace
 
-모든 chapter 예제는 단순한 답변 한 줄 대신 학습용 trace를 출력합니다. 공통적으로 `mode:`를 먼저 보여 주고, chapter 성격에 따라 input variables, prompt messages, tool calls, graph route, stream chunks, callback events, retrieved sources, final answer를 단계별로 출력합니다.
+모든 chapter 예제는 단순한 답변 한 줄 대신 학습용 trace를 출력합니다. 공통적으로 `mode:`를 먼저 보여 주고, 다음 학습 섹션을 포함합니다.
+
+- `learning goal:`: 이 chapter에서 관찰할 핵심 목표
+- `what happens:`: 입력이 component를 지나며 바뀌는 단계별 흐름
+- `why it matters:`: 실제 agent 애플리케이션에서 이 구조가 중요한 이유
+- `try next:`: 같은 예제를 변형해 볼 수 있는 짧은 실습 제안
+
+그 뒤에는 chapter 성격에 따라 input variables, prompt messages, tool calls, graph route, stream chunks, callback events, retrieved sources, final answer를 단계별로 출력합니다.
 
 Chapter 03-09는 OpenAI 설정을 읽지만 기본 실행에서는 fake fallback을 사용합니다. 실제 API 호출은 `RUN_AGENT_LEARNING_INTEGRATION=1`과 `OPENAI_API_KEY`가 모두 있을 때만 실행되며, 출력에는 API key 값이 절대 포함되지 않습니다.
 

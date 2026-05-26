@@ -40,6 +40,23 @@ def select_streaming_model(*fake_chunks: str) -> ExampleModelSelection:
     return ExampleModelSelection("fake", FakeStreamingChatModel(*fake_chunks), config, requested)
 
 
+def print_learning_sections(
+    *,
+    goal: str,
+    happens: Iterable[str],
+    matters: str,
+    try_next: Iterable[str],
+) -> None:
+    print(f"learning goal: {goal}")
+    print("what happens:")
+    for item in happens:
+        print(f"- {item}")
+    print(f"why it matters: {matters}")
+    print("try next:")
+    for item in try_next:
+        print(f"- {item}")
+
+
 def print_model_selection(selection: ExampleModelSelection) -> None:
     print(f"mode: {selection.mode}")
     print("config:")

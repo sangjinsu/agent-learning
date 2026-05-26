@@ -37,7 +37,9 @@ def test_all_examples_print_detailed_learning_trace():
         "ch09_rag.py": ["mode:", "loaded documents:", "retrieved sources:", "prompt context summary:", "final answer:"],
     }
 
+    friendly_sections = ["learning goal:", "what happens:", "why it matters:", "try next:"]
+
     for filename, expected_parts in examples.items():
         output = run_example(filename)
-        for expected in expected_parts:
+        for expected in [*friendly_sections, *expected_parts]:
             assert expected in output, f"{filename} output did not include {expected!r}:\n{output}"
