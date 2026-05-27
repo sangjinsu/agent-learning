@@ -37,7 +37,11 @@ def test_all_examples_print_detailed_learning_trace():
         "ch09_rag.py": ["mode:", "loaded documents:", "retrieved sources:", "prompt context summary:", "final answer:"],
         "ch10_mcp.py": [
             "mode:",
+            "mcp flow:",
+            "target chapter:",
             "server transport:",
+            "mcp call trace:",
+            "client -> initialize",
             "available tools:",
             "available resources:",
             "available prompts:",
@@ -46,9 +50,30 @@ def test_all_examples_print_detailed_learning_trace():
         ],
     }
 
-    friendly_sections = ["learning goal:", "what happens:", "why it matters:", "try next:"]
+    friendly_sections = [
+        "learning goal:",
+        "what happens:",
+        "why it matters:",
+        "try next:",
+        "학습 목표:",
+        "실행 흐름:",
+        "중요한 이유:",
+        "다음 실습:",
+    ]
 
     for filename, expected_parts in examples.items():
         output = run_example(filename)
         for expected in [*friendly_sections, *expected_parts]:
             assert expected in output, f"{filename} output did not include {expected!r}:\n{output}"
+
+
+def test_ch10_mcp_tool_mode_prints_actual_tool_call_trace():
+    output = run_example("ch10_mcp.py", "tool")
+
+    assert "mcp flow: tool" in output
+    assert "target chapter: tool" in output
+    assert "client -> call_tool name=summarize_chapter arguments={'chapter': 'tool'}" in output
+    assert "server -> tool result:" in output
+    assert "MCP tools are callable actions" in output
+    assert "resource content:" not in output
+    assert "prompt messages:" not in output

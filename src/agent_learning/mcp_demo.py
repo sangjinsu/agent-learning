@@ -35,6 +35,8 @@ CHAPTER_NOTES = {
 
 @dataclass(frozen=True)
 class MCPDemoResult:
+    flow: str
+    trace: list[str]
     tool_names: list[str]
     resource_templates: list[str]
     prompt_names: list[str]
@@ -78,36 +80,93 @@ def run_server_stdio() -> None:
     create_mcp_server().run(transport="stdio")
 
 
-async def run_mcp_demo(chapter: str = "mcp") -> MCPDemoResult:
+async def run_mcp_demo(chapter: str = "mcp", flow: str = "full") -> MCPDemoResult:
+    selected_flow = normalize_flow(flow)
     server_params = _server_parameters()
     with open(os.devnull, "w") as errlog:
         async with stdio_client(server_params, errlog=errlog) as (read, write):
             async with ClientSession(read, write) as session:
+                trace: list[str] = []
+
+                trace.append("client -> initialize")
                 await session.initialize()
+                trace.append("server -> initialized session")
 
+                trace.append("client -> list_tools")
                 tools = await session.list_tools()
-                resource_templates = await session.list_resource_templates()
-                prompts = await session.list_prompts()
+                tool_names = [tool_info.name for tool_info in tools.tools]
+                trace.append(f"server -> tools: {_join_names(tool_names)}")
 
-                resource = await session.read_resource(f"chapter://{chapter}")
-                prompt = await session.get_prompt("review_chapter", arguments={"chapter": chapter})
-                tool = await session.call_tool(
-                    "summarize_chapter",
-                    arguments={"chapter": chapter},
-                )
+                trace.append("client -> list_resource_templates")
+                resource_templates = await session.list_resource_templates()
+                resource_template_names = [
+                    str(template.uriTemplate)
+                    for template in resource_templates.resourceTemplates
+                ]
+                trace.append(f"server -> resource templates: {_join_names(resource_template_names)}")
+
+                trace.append("client -> list_prompts")
+                prompts = await session.list_prompts()
+                prompt_names = [prompt_info.name for prompt_info in prompts.prompts]
+                trace.append(f"server -> prompts: {_join_names(prompt_names)}")
+
+                resource_content = ""
+                prompt_text = ""
+                tool_result = ""
+
+                if selected_flow in {"full", "resource"}:
+                    resource_uri = f"chapter://{chapter}"
+                    trace.append(f"client -> read_resource uri={resource_uri}")
+                    resource = await session.read_resource(resource_uri)
+                    resource_content = _first_text(resource.contents)
+                    trace.append(f"server -> resource text: {resource_content}")
+
+                if selected_flow in {"full", "prompt"}:
+                    prompt_arguments = {"chapter": chapter}
+                    trace.append(
+                        "client -> get_prompt "
+                        f"name=review_chapter arguments={prompt_arguments}"
+                    )
+                    prompt = await session.get_prompt(
+                        "review_chapter",
+                        arguments=prompt_arguments,
+                    )
+                    prompt_text = _prompt_text(prompt.messages)
+                    trace.append(f"server -> prompt messages: {prompt_text}")
+
+                if selected_flow in {"full", "tool"}:
+                    tool_arguments = {"chapter": chapter}
+                    trace.append(
+                        "client -> call_tool "
+                        f"name=summarize_chapter arguments={tool_arguments}"
+                    )
+                    tool = await session.call_tool(
+                        "summarize_chapter",
+                        arguments=tool_arguments,
+                    )
+                    tool_result = _first_text(tool.content)
+                    trace.append(f"server -> tool result: {tool_result}")
 
                 return MCPDemoResult(
-                    tool_names=[tool_info.name for tool_info in tools.tools],
-                    resource_templates=[
-                        str(template.uriTemplate)
-                        for template in resource_templates.resourceTemplates
-                    ],
-                    prompt_names=[prompt_info.name for prompt_info in prompts.prompts],
-                    resource_content=_first_text(resource.contents),
-                    prompt_text=_prompt_text(prompt.messages),
-                    tool_result=_first_text(tool.content),
-                    final_answer="MCP stdio demo completed.",
+                    flow=selected_flow,
+                    trace=trace,
+                    tool_names=tool_names,
+                    resource_templates=resource_template_names,
+                    prompt_names=prompt_names,
+                    resource_content=resource_content,
+                    prompt_text=prompt_text,
+                    tool_result=tool_result,
+                    final_answer=f"MCP stdio {selected_flow} demo completed.",
                 )
+
+
+def normalize_flow(flow: str) -> str:
+    selected_flow = flow.strip().lower()
+    if selected_flow == "mcp":
+        return "full"
+    if selected_flow in {"discover", "resource", "prompt", "tool", "full"}:
+        return selected_flow
+    raise ValueError(f"unknown MCP demo flow: {flow}")
 
 
 def _server_parameters() -> StdioServerParameters:
@@ -125,6 +184,13 @@ def _server_parameters() -> StdioServerParameters:
         args=["-m", "agent_learning.mcp_demo", "server"],
         env=env,
     )
+
+
+def _join_names(names: Iterable[str]) -> str:
+    values = list(names)
+    if not values:
+        return "(none)"
+    return ", ".join(values)
 
 
 def _first_text(contents: Iterable[object]) -> str:

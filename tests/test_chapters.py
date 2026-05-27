@@ -207,20 +207,57 @@ def test_ch10_mcp_demo_exposes_tool_resource_and_prompt_over_stdio():
 
     result = asyncio.run(run_mcp_demo("mcp"))
 
+    assert result.flow == "full"
+    assert "client -> initialize" in result.trace
+    assert "client -> list_tools" in result.trace
+    assert any(step.startswith("client -> read_resource uri=chapter://mcp") for step in result.trace)
+    assert any(step.startswith("client -> get_prompt name=review_chapter") for step in result.trace)
+    assert any(step.startswith("client -> call_tool name=summarize_chapter") for step in result.trace)
     assert "summarize_chapter" in result.tool_names
     assert "chapter://{chapter}" in result.resource_templates
     assert "review_chapter" in result.prompt_names
     assert "Model Context Protocol" in result.resource_content
     assert "Review Chapter 10 MCP" in result.prompt_text
     assert "MCP connects hosts to external capabilities" in result.tool_result
-    assert result.final_answer == "MCP stdio demo completed."
+    assert result.final_answer == "MCP stdio full demo completed."
+
+
+def test_ch10_mcp_demo_supports_focused_flows():
+    import asyncio
+
+    from agent_learning.mcp_demo import run_mcp_demo
+
+    discover = asyncio.run(run_mcp_demo("mcp", flow="discover"))
+    resource = asyncio.run(run_mcp_demo("resource", flow="resource"))
+    prompt = asyncio.run(run_mcp_demo("prompt", flow="prompt"))
+    tool = asyncio.run(run_mcp_demo("tool", flow="tool"))
+
+    assert discover.flow == "discover"
+    assert discover.resource_content == ""
+    assert discover.prompt_text == ""
+    assert discover.tool_result == ""
+
+    assert "MCP resources expose read-only context" in resource.resource_content
+    assert resource.prompt_text == ""
+    assert resource.tool_result == ""
+
+    assert prompt.resource_content == ""
+    assert "MCP prompts package reusable instructions" in prompt.prompt_text
+    assert prompt.tool_result == ""
+
+    assert tool.resource_content == ""
+    assert tool.prompt_text == ""
+    assert "MCP tools are callable actions" in tool.tool_result
 
 
 def test_ch10_mcp_demo_rejects_unknown_chapter():
-    from agent_learning.mcp_demo import chapter_note
+    from agent_learning.mcp_demo import chapter_note, normalize_flow
 
     with pytest.raises(ValueError, match="unknown chapter"):
         chapter_note("unknown")
+
+    with pytest.raises(ValueError, match="unknown MCP demo flow"):
+        normalize_flow("unknown")
 
 
 def test_integration_flag_example_is_opt_in():

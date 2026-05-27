@@ -48,11 +48,15 @@ def print_learning_sections(
     try_next: Iterable[str],
 ) -> None:
     print(f"learning goal: {goal}")
+    print(f"학습 목표: {goal}")
     print("what happens:")
+    print("실행 흐름:")
     for item in happens:
         print(f"- {item}")
     print(f"why it matters: {matters}")
+    print(f"중요한 이유: {matters}")
     print("try next:")
+    print("다음 실습:")
     for item in try_next:
         print(f"- {item}")
 

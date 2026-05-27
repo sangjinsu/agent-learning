@@ -29,6 +29,30 @@ RUN_AGENT_LEARNING_INTEGRATION=1 uv run pytest tests/test_openai_integration.py 
 
 `OPENAI_API_KEY`가 없으면 integration tests는 skip됩니다.
 
+## Quick Run Examples
+
+각 chapter를 바로 실행해 보고 싶다면 아래 명령을 순서대로 사용합니다. 기본 실행은 fake model 또는 local testdata를 사용하므로 외부 API를 호출하지 않습니다.
+
+```bash
+uv run python examples/ch01_chatmodel.py "What is LangChain?"
+uv run python examples/ch02_prompt_template.py "How does ChatPromptTemplate work?"
+uv run python examples/ch03_openai_chatmodel.py "What does ChatOpenAI do?"
+uv run python examples/ch04_tool_calling.py "12 * (7 + 3)"
+uv run python examples/ch05_chain.py "How does Chain work?"
+uv run python examples/ch06_graph.py
+uv run python examples/ch06_graph.py "calculate: 7 * (8 + 2)"
+uv run python examples/ch07_streaming.py "How does streaming work?"
+uv run python examples/ch08_callback_observability.py "callback observability는 무엇을 관찰하나요?"
+uv run python examples/ch09_rag.py "Chapter 8 callback은 RAG에서 어떤 흐름을 관찰하나요?"
+uv run python examples/ch09_rag.py "tool calling calculator schema safe arithmetic"
+uv run python examples/ch09_rag.py "streaming chunk final answer user interface"
+uv run python examples/ch10_mcp.py discover
+uv run python examples/ch10_mcp.py resource
+uv run python examples/ch10_mcp.py prompt
+uv run python examples/ch10_mcp.py tool
+uv run python examples/ch10_mcp.py full
+```
+
 ## Project Structure
 
 ```text
@@ -78,12 +102,12 @@ testdata/
 
 ## Detailed CLI Trace
 
-모든 chapter 예제는 단순한 답변 한 줄 대신 학습용 trace를 출력합니다. 공통적으로 `mode:`를 먼저 보여 주고, 다음 학습 섹션을 포함합니다.
+모든 chapter 예제는 단순한 답변 한 줄 대신 학습용 trace를 출력합니다. 공통적으로 `mode:`를 먼저 보여 주고, 영어 라벨과 한국어 라벨을 함께 포함합니다.
 
-- `learning goal:`: 이 chapter에서 관찰할 핵심 목표
-- `what happens:`: 입력이 component를 지나며 바뀌는 단계별 흐름
-- `why it matters:`: 실제 agent 애플리케이션에서 이 구조가 중요한 이유
-- `try next:`: 같은 예제를 변형해 볼 수 있는 짧은 실습 제안
+- `learning goal:` / `학습 목표:`: 이 chapter에서 관찰할 핵심 목표
+- `what happens:` / `실행 흐름:`: 입력이 component를 지나며 바뀌는 단계별 흐름
+- `why it matters:` / `중요한 이유:`: 실제 agent 애플리케이션에서 이 구조가 중요한 이유
+- `try next:` / `다음 실습:`: 같은 예제를 변형해 볼 수 있는 짧은 실습 제안
 
 그 뒤에는 chapter 성격에 따라 input variables, prompt messages, tool calls, graph route, stream chunks, callback events, retrieved sources, final answer를 단계별로 출력합니다.
 
@@ -543,15 +567,32 @@ flowchart LR
 실행 명령:
 
 ```bash
-uv run python examples/ch10_mcp.py mcp
+uv run python examples/ch10_mcp.py discover
+uv run python examples/ch10_mcp.py resource
+uv run python examples/ch10_mcp.py prompt
 uv run python examples/ch10_mcp.py tool
+uv run python examples/ch10_mcp.py full
+uv run python examples/ch10_mcp.py mcp
 ```
+
+각 명령이 보여주는 MCP 동작:
+
+- `discover`: `initialize`, `list_tools`, `list_resource_templates`, `list_prompts`로 server capability를 발견합니다.
+- `resource`: `read_resource uri=chapter://resource` 호출과 resource response를 봅니다.
+- `prompt`: `get_prompt name=review_chapter` 호출과 prompt message response를 봅니다.
+- `tool`: `call_tool name=summarize_chapter` 호출과 tool result response를 봅니다.
+- `full`: discover, resource, prompt, tool 흐름을 한 번에 실행합니다.
+- `mcp`: 기존 명령과의 호환을 위해 `full`과 같은 흐름을 실행합니다.
+
+출력에는 `mcp call trace:`가 포함되어 실제 client request와 server response 흐름을 단계별로 보여 줍니다.
 
 테스트 명령:
 
 ```bash
 uv run pytest tests/test_chapters.py::test_ch10_mcp_demo_exposes_tool_resource_and_prompt_over_stdio -q
+uv run pytest tests/test_chapters.py::test_ch10_mcp_demo_supports_focused_flows -q
 uv run pytest tests/test_examples.py::test_all_examples_print_detailed_learning_trace -q
+uv run pytest tests/test_examples.py::test_ch10_mcp_tool_mode_prints_actual_tool_call_trace -q
 ```
 
 다음 장에서 할 일:
