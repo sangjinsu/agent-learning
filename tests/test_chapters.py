@@ -200,6 +200,29 @@ def test_ch09_extra_rag_examples_cover_tool_calling_and_streaming():
         assert retrieved[0].id == expected_id
 
 
+def test_ch10_mcp_demo_exposes_tool_resource_and_prompt_over_stdio():
+    import asyncio
+
+    from agent_learning.mcp_demo import run_mcp_demo
+
+    result = asyncio.run(run_mcp_demo("mcp"))
+
+    assert "summarize_chapter" in result.tool_names
+    assert "chapter://{chapter}" in result.resource_templates
+    assert "review_chapter" in result.prompt_names
+    assert "Model Context Protocol" in result.resource_content
+    assert "Review Chapter 10 MCP" in result.prompt_text
+    assert "MCP connects hosts to external capabilities" in result.tool_result
+    assert result.final_answer == "MCP stdio demo completed."
+
+
+def test_ch10_mcp_demo_rejects_unknown_chapter():
+    from agent_learning.mcp_demo import chapter_note
+
+    with pytest.raises(ValueError, match="unknown chapter"):
+        chapter_note("unknown")
+
+
 def test_integration_flag_example_is_opt_in():
     if not integration_enabled():
         pytest.skip("set RUN_AGENT_LEARNING_INTEGRATION=1 in the environment or .env to call external APIs")

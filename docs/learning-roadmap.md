@@ -9,3 +9,4 @@
 7. Streaming은 chunk를 수집해 최종 answer로 합칩니다.
 8. Observability는 실행 event를 별도 recorder에 남깁니다.
 9. RAG는 keyword retriever, context prompt, source metadata에 집중합니다.
+10. MCP는 FastMCP server와 stdio client로 tool, resource, prompt 호출 흐름을 보여줍니다.

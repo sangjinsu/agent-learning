@@ -11,6 +11,7 @@ Go판의 Eino component 개념은 Python에서 다음처럼 대응합니다.
 - `ToolsNode` -> local `ToolMessage` execution loop
 - `Graph` -> LangGraph `StateGraph`
 - `Retriever` -> `InMemoryKeywordRetriever`
+- `MCP server` -> `FastMCP` + `ClientSession` stdio demo
 
 Chapter별 integration coverage:
 
@@ -21,3 +22,4 @@ Chapter별 integration coverage:
 - Chapter 07: streaming chunk collection
 - Chapter 08: observable chain event recording
 - Chapter 09: keyword RAG, context prompt, source metadata
+- Chapter 10: local MCP stdio server/client, tool/resource/prompt

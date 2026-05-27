@@ -35,6 +35,15 @@ def test_all_examples_print_detailed_learning_trace():
         "ch07_streaming.py": ["mode:", "prompt messages:", "stream chunks:", "final answer:"],
         "ch08_callback_observability.py": ["mode:", "callback events:", "final answer:"],
         "ch09_rag.py": ["mode:", "loaded documents:", "retrieved sources:", "prompt context summary:", "final answer:"],
+        "ch10_mcp.py": [
+            "mode:",
+            "server transport:",
+            "available tools:",
+            "available resources:",
+            "available prompts:",
+            "tool result:",
+            "final answer:",
+        ],
     }
 
     friendly_sections = ["learning goal:", "what happens:", "why it matters:", "try next:"]

@@ -1,7 +1,7 @@
 [project]
 name = "agent-learning"
 version = "0.1.0"
-description = "Python LangGraph/LangChain learning project mirroring eino-learning chapters 01-09."
+description = "Python LangGraph/LangChain/MCP learning project with chapters 01-10."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -9,6 +9,7 @@ dependencies = [
     "langchain-core>=1.0.0",
     "langchain-openai>=1.0.0",
     "langgraph>=1.0.0",
+    "mcp>=1.12.4",
     "python-dotenv>=1.0.1",
 ]
 

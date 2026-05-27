@@ -42,9 +42,11 @@ examples/
   ch07_streaming.py
   ch08_callback_observability.py
   ch09_rag.py
+  ch10_mcp.py
 src/agent_learning/
   example_support.py
   fake.py
+  mcp_demo.py
   llm/
     prompting.py
     chat.py
@@ -72,6 +74,7 @@ testdata/
 - Tool calling: `bind_tools()`와 allowlist 기반 tool execution loop를 사용합니다.
 - Graph: LangGraph `StateGraph`로 route, calculator, prompt, model node를 연결합니다.
 - Retriever: `InMemoryKeywordRetriever`가 local 문서를 검색하고 source metadata를 유지합니다.
+- MCP: `FastMCP` server와 stdio client session으로 tool/resource/prompt를 노출하고 호출합니다.
 
 ## Detailed CLI Trace
 
@@ -508,9 +511,52 @@ uv run pytest tests/test_chapters.py::test_ch09_load_documents_uses_first_text_l
 RUN_AGENT_LEARNING_INTEGRATION=1 uv run pytest tests/test_openai_integration.py::test_openai_rag_integration -v
 ```
 
+## Chapter 10. MCP 기초
+
+이번 장의 목표:
+
+- Model Context Protocol이 host와 external capability 사이의 표준 연결 계층이라는 점을 이해합니다.
+- `FastMCP` server가 tool, resource, prompt를 어떻게 노출하는지 확인합니다.
+- stdio client가 server process를 시작하고 `ClientSession`으로 initialize/list/read/call 흐름을 실행하는 과정을 봅니다.
+
+핵심 개념:
+
+- MCP server는 model 자체가 아니라 host가 사용할 수 있는 capability surface를 제공합니다.
+- Tool은 structured input을 받는 callable action입니다.
+- Resource는 host가 읽을 수 있는 context URI입니다.
+- Prompt는 재사용 가능한 workflow instruction입니다.
+- 이번 장은 배포용 remote connector가 아니라 local stdio 학습 예제입니다.
+
+MCP 흐름 그래프:
+
+```mermaid
+flowchart LR
+    cli["ch10_mcp.py"] --> client["stdio client"]
+    client --> session["ClientSession.initialize"]
+    session --> server["FastMCP server process"]
+    server --> tools["tools: summarize_chapter"]
+    server --> resources["resources: chapter://{chapter}"]
+    server --> prompts["prompts: review_chapter"]
+    client --> result["tool/resource/prompt results"]
+```
+
+실행 명령:
+
+```bash
+uv run python examples/ch10_mcp.py mcp
+uv run python examples/ch10_mcp.py tool
+```
+
+테스트 명령:
+
+```bash
+uv run pytest tests/test_chapters.py::test_ch10_mcp_demo_exposes_tool_resource_and_prompt_over_stdio -q
+uv run pytest tests/test_examples.py::test_all_examples_print_detailed_learning_trace -q
+```
+
 다음 장에서 할 일:
 
-- Chapter 10에서 ReAct Agent를 다룹니다.
+- Chapter 11 후보로 ReAct Agent를 다룹니다.
 
 ## 전체 검증 명령
 
@@ -537,3 +583,4 @@ RUN_AGENT_LEARNING_INTEGRATION=1 uv run pytest tests/test_openai_integration.py 
 - Chapter 07: streaming chunk collection
 - Chapter 08: observable chain event recording
 - Chapter 09: keyword RAG, context prompt, source metadata
+- Chapter 10: local MCP stdio server/client, tool/resource/prompt
