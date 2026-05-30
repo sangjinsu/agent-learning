@@ -7,7 +7,7 @@
 ## 공통 규칙
 
 - 기본 실행은 fake model 또는 local testdata만 사용합니다.
-- 실제 OpenAI 연동은 `RUN_AGENT_LEARNING_INTEGRATION=1`일 때만 실행합니다.
+- 실제 provider 연동은 `RUN_AGENT_LEARNING_INTEGRATION=1`일 때만 실행합니다.
 - 예제 CLI는 `mode:`, 학습 목표, 실행 흐름, 중요한 이유, 다음 실습을 함께 출력합니다.
 - 새 chapter를 추가할 때는 code, example, tests, README, guides, docs를 같은 작업 단위에서 맞춥니다.
 
@@ -32,7 +32,7 @@ Go판 Eino component 개념은 Python에서 다음처럼 대응합니다.
 | --- | --- | --- | --- | --- |
 | 01 | ChatModel | [01-chatmodel.md](chapters/01-chatmodel.md) | `examples/ch01_chatmodel.py` | `test_ch01_chat_service_uses_fake_model` |
 | 02 | Prompt Template | [02-prompt-template.md](chapters/02-prompt-template.md) | `examples/ch02_prompt_template.py` | `test_ch02_prompt_formats_system_history_and_question` |
-| 03 | OpenAI ChatModel | [03-openai-chatmodel.md](chapters/03-openai-chatmodel.md) | `examples/ch03_openai_chatmodel.py` | `test_ch03_config_prefers_environment_and_disables_integration_by_default` |
+| 03 | Provider ChatModel | [03-openai-chatmodel.md](chapters/03-openai-chatmodel.md) | `examples/ch03_openai_chatmodel.py` | `test_ch03_config_prefers_environment_and_disables_integration_by_default` |
 | 04 | Tool Calling | [04-tool-calling.md](chapters/04-tool-calling.md) | `examples/ch04_tool_calling.py` | `test_ch04_tool_calling_executes_calculator_loop` |
 | 05 | Chain | [05-chain.md](chapters/05-chain.md) | `examples/ch05_chain.py` | `test_ch05_chain_service_runs_prompt_model_chain_with_trace` |
 | 06 | Graph | [06-graph.md](chapters/06-graph.md) | `examples/ch06_graph.py` | `test_ch06_graph_routes_calculation_without_model_call_and_chat_with_model_call` |
@@ -44,7 +44,7 @@ Go판 Eino component 개념은 Python에서 다음처럼 대응합니다.
 
 ## Integration Coverage
 
-- Chapter 03: `ChatOpenAI` factory와 `ChatService`
+- Chapter 03: `ChatOpenAI` / `ChatAnthropic` provider factory와 `ChatService`
 - Chapter 04: `bind_tools` 기반 calculator tool calling
 - Chapter 05: runnable chain과 history prompt
 - Chapter 06: LangGraph calculator/chat routing

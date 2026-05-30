@@ -4,7 +4,7 @@
 
 - LangChain chat model의 `stream()`이 chunk를 순서대로 반환하는 흐름을 이해합니다.
 - chunk를 반복해서 받아 최종 answer로 합칩니다.
-- unit test는 fake streaming model로 검증하고, integration test는 실제 `ChatOpenAI`로 실행합니다.
+- unit test는 fake streaming model로 검증하고, integration test는 실제 provider ChatModel로 실행합니다.
 
 ## 핵심 개념
 

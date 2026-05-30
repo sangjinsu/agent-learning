@@ -8,11 +8,11 @@ from langchain_core.messages import BaseMessage
 from langchain_core.tools import BaseTool
 
 from agent_learning.fake import FakeChatModel, FakeStreamingChatModel
-from agent_learning.llm.openai import (
-    OpenAIConfig,
-    integration_enabled,
-    load_config_from_env,
-    new_chat_model,
+from agent_learning.llm.openai import integration_enabled
+from agent_learning.llm.providers import (
+    ModelProviderConfig,
+    load_provider_config_from_env,
+    new_provider_chat_model,
 )
 
 
@@ -20,23 +20,23 @@ from agent_learning.llm.openai import (
 class ExampleModelSelection:
     mode: str
     model: Any
-    config: OpenAIConfig
+    config: ModelProviderConfig
     integration_requested: bool
 
 
 def select_chat_model(fake_response: str) -> ExampleModelSelection:
-    config = load_config_from_env()
+    config = load_provider_config_from_env()
     requested = integration_enabled()
-    if requested and config.api_key.strip():
-        return ExampleModelSelection("openai", new_chat_model(config), config, requested)
+    if requested and config.active_api_key.strip():
+        return ExampleModelSelection(config.provider, new_provider_chat_model(config), config, requested)
     return ExampleModelSelection("fake", FakeChatModel(fake_response), config, requested)
 
 
 def select_streaming_model(*fake_chunks: str) -> ExampleModelSelection:
-    config = load_config_from_env()
+    config = load_provider_config_from_env()
     requested = integration_enabled()
-    if requested and config.api_key.strip():
-        return ExampleModelSelection("openai", new_chat_model(config), config, requested)
+    if requested and config.active_api_key.strip():
+        return ExampleModelSelection(config.provider, new_provider_chat_model(config), config, requested)
     return ExampleModelSelection("fake", FakeStreamingChatModel(*fake_chunks), config, requested)
 
 
@@ -64,17 +64,24 @@ def print_learning_sections(
 def print_model_selection(selection: ExampleModelSelection) -> None:
     print(f"mode: {selection.mode}")
     print("config:")
+    print(f"- provider: {selection.config.provider}")
     print(f"- integration_requested: {_bool_text(selection.integration_requested)}")
-    print(f"- openai_model: {selection.config.model}")
-    print(f"- openai_base_url: {selection.config.base_url or '(default)'}")
-    print(f"- openai_api_key_set: {_bool_text(bool(selection.config.api_key.strip()))}")
+    print(f"- openai_model: {selection.config.openai.model}")
+    print(f"- openai_base_url: {selection.config.openai.base_url or '(default)'}")
+    print(f"- openai_api_key_set: {_bool_text(bool(selection.config.openai.api_key.strip()))}")
+    print(f"- anthropic_model: {selection.config.anthropic.model}")
+    print(f"- anthropic_api_key_set: {_bool_text(bool(selection.config.anthropic.api_key.strip()))}")
     if selection.mode == "fake":
         if selection.integration_requested:
-            print("- note: OpenAI integration requested but OPENAI_API_KEY is missing. Using fake fallback.")
+            print(
+                f"- note: {selection.config.provider} integration requested but "
+                f"{selection.config.active_api_key_name} is missing. Using fake fallback."
+            )
         else:
             print(
-                "- note: OpenAI integration is disabled. Using fake fallback. "
-                "Set RUN_AGENT_LEARNING_INTEGRATION=1 and OPENAI_API_KEY to call OpenAI."
+                "- note: OpenAI integration is disabled. Anthropic uses the same opt-in flag. "
+                "Using fake fallback. Set RUN_AGENT_LEARNING_INTEGRATION=1 and a provider API key "
+                "to call a real model."
             )
 
 

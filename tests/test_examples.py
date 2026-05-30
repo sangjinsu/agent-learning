@@ -12,7 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 def run_example(filename: str, *args: str) -> str:
     env = os.environ.copy()
     env["RUN_AGENT_LEARNING_INTEGRATION"] = "0"
+    env["AGENT_LEARNING_PROVIDER"] = "openai"
     env["OPENAI_API_KEY"] = ""
+    env["ANTHROPIC_API_KEY"] = ""
     completed = subprocess.run(
         [sys.executable, str(ROOT / "examples" / filename), *args],
         cwd=ROOT,

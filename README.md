@@ -2,7 +2,7 @@
 
 Python, LangChain, LangGraph로 agent 애플리케이션의 기본 구성 요소를 단계별로 익히는 학습 저장소입니다.
 
-각 chapter는 실행 가능한 CLI 예제와 pytest를 함께 제공합니다. 기본 실행은 fake model과 local testdata를 사용하므로 외부 LLM API를 호출하지 않습니다. 실제 OpenAI 호출은 `RUN_AGENT_LEARNING_INTEGRATION=1`을 명시했을 때만 opt-in으로 실행합니다.
+각 chapter는 실행 가능한 CLI 예제와 pytest를 함께 제공합니다. 기본 실행은 fake model과 local testdata를 사용하므로 외부 LLM API를 호출하지 않습니다. 실제 OpenAI 또는 Anthropic 호출은 `RUN_AGENT_LEARNING_INTEGRATION=1`을 명시했을 때만 opt-in으로 실행합니다.
 
 ## Quick Start
 
@@ -11,6 +11,7 @@ Python, LangChain, LangGraph로 agent 애플리케이션의 기본 구성 요소
 - Python 3.11 이상
 - `uv`
 - 실제 OpenAI integration 실행 시 `OPENAI_API_KEY`
+- 실제 Anthropic integration 실행 시 `ANTHROPIC_API_KEY`
 
 설치와 기본 검증:
 
@@ -19,12 +20,13 @@ uv sync
 uv run pytest
 ```
 
-기본 `uv run pytest`는 외부 API를 호출하지 않습니다. `OPENAI_API_KEY`가 없으면 integration tests는 skip됩니다.
+기본 `uv run pytest`는 외부 API를 호출하지 않습니다. provider API key가 없으면 integration tests는 skip됩니다.
 
-실제 OpenAI 연동 테스트:
+실제 provider 연동 테스트:
 
 ```bash
 RUN_AGENT_LEARNING_INTEGRATION=1 uv run pytest tests/test_openai_integration.py -v
+RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=anthropic uv run pytest tests/test_provider_integration.py -v
 ```
 
 ## Quick Run Examples
@@ -52,13 +54,20 @@ uv run python examples/ch10_mcp.py full
 uv run python examples/ch11_react_agent.py "12 * (7 + 3)"
 ```
 
+Chapter 11 ReAct Agent를 실제 모델로 실행하려면 integration flag와 provider key를 함께 설정합니다.
+
+```bash
+RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=openai uv run python examples/ch11_react_agent.py "12 * (7 + 3)"
+RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=anthropic uv run python examples/ch11_react_agent.py "12 * (7 + 3)"
+```
+
 ## Learning Map
 
 | Chapter | Topic | 관찰할 흐름 |
 | --- | --- | --- |
 | 01 | ChatModel | fake model로 질문/응답 service 경계를 만듭니다. |
 | 02 | Prompt Template | system/history/user message 순서를 고정합니다. |
-| 03 | OpenAI ChatModel | `.env` 기반 provider 설정과 opt-in integration을 분리합니다. |
+| 03 | Provider ChatModel | `.env` 기반 provider 설정과 opt-in integration을 분리합니다. |
 | 04 | Tool Calling | model tool call을 allowlist 기반 local tool execution으로 연결합니다. |
 | 05 | Chain | `ChatPromptTemplate | model` runnable pipeline을 구성합니다. |
 | 06 | Graph | LangGraph로 calculator/chat branch를 routing합니다. |
@@ -86,6 +95,7 @@ testdata/docs/ch09-rag/   # RAG용 local 문서
 핵심 구성 요소:
 
 - Chat model: `invoke()`와 `stream()`을 통해 답변 또는 chunk를 반환합니다.
+- Provider selection: `AGENT_LEARNING_PROVIDER=openai|anthropic`으로 실제 model provider를 선택합니다.
 - Prompt template: `ChatPromptTemplate`으로 system/history/user message를 구성합니다.
 - Tool calling: `bind_tools()`와 allowlist 기반 tool execution loop를 사용합니다.
 - Graph: LangGraph `StateGraph`로 route, calculator, prompt, model node를 연결합니다.
@@ -113,10 +123,13 @@ testdata/docs/ch09-rag/   # RAG용 local 문서
 OPENAI_API_KEY=your-api-key
 OPENAI_MODEL=gpt-4.1-mini
 OPENAI_BASE_URL=
+AGENT_LEARNING_PROVIDER=openai
+ANTHROPIC_API_KEY=your-anthropic-api-key
+ANTHROPIC_MODEL=claude-sonnet-4-6
 RUN_AGENT_LEARNING_INTEGRATION=0
 ```
 
-실제 OpenAI 호출을 실행할 때만 `RUN_AGENT_LEARNING_INTEGRATION=1`로 바꿉니다.
+실제 provider 호출을 실행할 때만 `RUN_AGENT_LEARNING_INTEGRATION=1`로 바꿉니다.
 
 설정 우선순위:
 
@@ -124,7 +137,7 @@ RUN_AGENT_LEARNING_INTEGRATION=0
 2. repository root의 `.env`
 3. 코드 기본값
 
-기본 모델명은 `gpt-4.1-mini`입니다.
+기본 provider는 `openai`입니다. 기본 모델명은 OpenAI `gpt-4.1-mini`, Anthropic `claude-sonnet-4-6`입니다.
 
 ## Verification
 
@@ -136,10 +149,11 @@ uv run python -m compileall -q src examples tests
 uv lock --check
 ```
 
-실제 OpenAI integration 검증:
+실제 provider integration 검증:
 
 ```bash
 RUN_AGENT_LEARNING_INTEGRATION=1 uv run pytest tests/test_openai_integration.py -v
+RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=anthropic uv run pytest tests/test_provider_integration.py -v
 ```
 
 ## Documentation
@@ -157,4 +171,4 @@ RUN_AGENT_LEARNING_INTEGRATION=1 uv run pytest tests/test_openai_integration.py 
 - Chapter 03-09 OpenAI integration tests는 opt-in입니다.
 - Chapter 09는 embedding/vector store 없이 in-memory keyword retrieval만 다룹니다.
 - Chapter 10은 배포용 remote connector가 아니라 local stdio MCP 학습 예제입니다.
-- Chapter 11은 실제 OpenAI agent가 아니라 fake model과 calculator tool로 보는 local ReAct 학습 예제입니다.
+- Chapter 11은 fake mode가 기본이며, opt-in으로 OpenAI 또는 Anthropic 실제 모델 ReAct 예시를 실행할 수 있습니다.

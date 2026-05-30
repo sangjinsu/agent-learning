@@ -34,4 +34,4 @@ uv run pytest tests/test_chapters.py::test_ch02_prompt_formats_system_history_an
 
 ## 다음 장
 
-Chapter 03에서는 `ChatOpenAI`를 같은 service 경계에 주입합니다.
+Chapter 03에서는 실제 provider ChatModel을 같은 service 경계에 주입합니다.

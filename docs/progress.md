@@ -5,6 +5,7 @@
 - Chapter 01-11 Python modules, examples, tests, docs are implemented.
 - Unit tests use fake models and local data by default.
 - Chapter 03-09 OpenAI integration tests are opt-in through `RUN_AGENT_LEARNING_INTEGRATION=1`.
+- Chapter 11 selected provider ReAct integration supports OpenAI and Anthropic through opt-in provider settings.
 - Default `uv run pytest` does not call external APIs.
 
 ## Current Learning Surfaces

@@ -6,7 +6,7 @@
 
 1. **ChatModel**: fake model로 질문/응답 service 경계를 먼저 익힙니다.
 2. **Prompt Template**: system, history, user message 순서를 고정합니다.
-3. **OpenAI ChatModel**: `.env`와 환경 변수로 provider 설정을 분리합니다.
+3. **Provider ChatModel**: `.env`와 환경 변수로 provider 설정을 분리합니다.
 4. **Tool Calling**: 안전한 calculator tool만 등록해 tool call loop를 익힙니다.
 5. **Chain**: `ChatPromptTemplate | model` 선형 흐름을 학습합니다.
 6. **Graph**: calculator branch와 chat branch routing을 보여줍니다.
@@ -24,7 +24,7 @@
 2. `guides/chapters.md`에서 chapter별 상세 문서 링크를 열고 목표와 핵심 개념을 읽습니다.
 3. `uv run python examples/chXX_*.py ...`로 CLI trace를 확인합니다.
 4. `uv run pytest tests/test_chapters.py::<test_name> -q`로 behavior를 검증합니다.
-5. 필요할 때만 `RUN_AGENT_LEARNING_INTEGRATION=1`로 실제 OpenAI integration을 실행합니다.
+5. 필요할 때만 `RUN_AGENT_LEARNING_INTEGRATION=1`로 실제 provider integration을 실행합니다.
 
 ## Expansion Candidates
 
@@ -39,5 +39,5 @@
 
 - Chapter 09는 embedding/vector store 없이 local keyword retrieval만 다룹니다.
 - Chapter 10은 배포용 connector가 아니라 local stdio MCP 학습 예제입니다.
-- Chapter 11은 fake model과 calculator tool로 ReAct loop를 관찰하는 local 학습 예제입니다.
+- Chapter 11은 fake mode를 기본으로 두고, opt-in 실제 provider 모델로도 ReAct loop를 관찰합니다.
 - shell, filesystem mutation, deployment tool은 초반 chapter에 등록하지 않습니다.

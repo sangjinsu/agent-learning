@@ -2,8 +2,13 @@ from __future__ import annotations
 
 import sys
 
-from agent_learning.example_support import print_learning_sections, print_messages, print_tool_schema
-from agent_learning.fake import FakeChatModel
+from agent_learning.example_support import (
+    print_learning_sections,
+    print_messages,
+    print_model_selection,
+    print_tool_schema,
+    select_chat_model,
+)
 from agent_learning.llm.react_agent import ReActAgentInput, ReActAgentResult, ReActAgentService
 from agent_learning.tools.calculator import calculator_tool
 
@@ -11,11 +16,12 @@ from agent_learning.tools.calculator import calculator_tool
 def main() -> None:
     question = " ".join(sys.argv[1:]) or "12 * (7 + 3)"
     tools = [calculator_tool()]
-    result = ReActAgentService(FakeChatModel("ReAct fallback response."), tools).run(
+    selection = select_chat_model("ReAct fallback response.")
+    result = ReActAgentService(selection.model, tools).run(
         ReActAgentInput(question=question),
     )
 
-    print("mode: fake")
+    print_model_selection(selection)
     print_learning_sections(
         goal="ReAct agent가 reasoning, action, observation을 반복한 뒤 final answer로 종료하는 흐름을 봅니다.",
         happens=[
@@ -27,6 +33,8 @@ def main() -> None:
         try_next=[
             '계산식을 바꿔 보세요: uv run python examples/ch11_react_agent.py "18 / (2 + 1)"',
             'tool 없이 답하는 경로를 보려면 일반 질문을 넣어 보세요: uv run python examples/ch11_react_agent.py "What is ReAct?"',
+            '실제 OpenAI 모델로 실행해 보세요: RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=openai uv run python examples/ch11_react_agent.py "12 * (7 + 3)"',
+            '실제 Anthropic 모델로 실행해 보세요: RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=anthropic uv run python examples/ch11_react_agent.py "12 * (7 + 3)"',
         ],
     )
     print(f"question: {question}")

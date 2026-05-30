@@ -27,7 +27,7 @@ def main() -> None:
         matters="Streaming은 긴 답변의 체감 대기 시간을 줄이고, UI에서 생성 중인 내용을 즉시 보여줄 수 있게 합니다.",
         try_next=[
             "fake chunk 문자열을 더 잘게 나누면 chunk count가 어떻게 바뀌는지 확인해 보세요.",
-            "실제 OpenAI mode에서 chunk 개수와 fake mode의 chunk 개수를 비교해 보세요.",
+            "실제 provider mode에서 chunk 개수와 fake mode의 chunk 개수를 비교해 보세요.",
         ],
     )
     print(f"question: {question}")

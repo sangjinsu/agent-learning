@@ -4,7 +4,7 @@
 
 - LangChain runnable composition으로 선형 component pipeline을 구성합니다.
 - 기존 `ChatPromptTemplate -> ChatModel` 흐름을 직접 호출 대신 `prompt | model` runnable로 실행합니다.
-- unit test는 fake model로 검증하고, integration test는 실제 `ChatOpenAI`로 실행합니다.
+- unit test는 fake model로 검증하고, integration test는 실제 provider ChatModel로 실행합니다.
 
 ## 핵심 개념
 

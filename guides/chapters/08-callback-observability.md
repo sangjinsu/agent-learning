@@ -11,7 +11,7 @@
 - Callback은 component 실행 전후와 error 시점에 호출되는 관찰 hook입니다.
 - Python판은 framework callback API 전체를 복제하는 대신 학습용 `CallbackRecorder`로 관찰 개념을 보여줍니다.
 - Callback은 답변을 대신 만들지 않고 옆에서 start/end/error event를 기록합니다.
-- Unit test는 fake model로 event 순서를 검증하고, integration test는 실제 OpenAI ChatModel로 실행합니다.
+- Unit test는 fake model로 event 순서를 검증하고, integration test는 실제 provider ChatModel로 실행합니다.
 
 ## 흐름
 

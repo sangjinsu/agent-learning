@@ -4,6 +4,7 @@
 
 - 공식 문서 기준 LangGraph는 `StateGraph`, `START`, `END`, `add_conditional_edges`, `compile`, `invoke` 패턴을 사용합니다.
 - 공식 문서 기준 LangChain은 `ChatPromptTemplate`, `ChatOpenAI`, `bind_tools`, `ToolMessage`, `StructuredTool` 패턴을 사용합니다.
+- 공식 문서 기준 Anthropic 연동은 `langchain_anthropic.ChatAnthropic`과 `bind_tools`를 사용하며, tool 실행은 host loop가 처리합니다.
 - Chapter 09는 embedding/vector store 없이 in-memory keyword retrieval만 다룹니다.
 - Chapter 10은 local `stdio` transport로 MCP server process와 client session을 함께 실행합니다.
 - Chapter 11은 `llm_call -> tool_node -> llm_call` LangGraph loop로 ReAct 흐름을 보여줍니다.

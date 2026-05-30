@@ -5,12 +5,14 @@ from pathlib import Path
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 
+from agent_learning.example_support import ExampleModelSelection
 from agent_learning.fake import FakeChatModel, FakeStreamingChatModel
 from agent_learning.llm.chain import ChainService
 from agent_learning.llm.chat import ChatService
 from agent_learning.llm.graph import GraphInput, GraphService
 from agent_learning.llm.observability import run_observable_chat_chain
 from agent_learning.llm.openai import OpenAIConfig, integration_enabled, load_config_from_env
+from agent_learning.llm.providers import AnthropicConfig, ModelProviderConfig, load_provider_config_from_env
 from agent_learning.llm.prompting import DEFAULT_SYSTEM_PROMPT, format_messages
 from agent_learning.llm.rag import Document, InMemoryKeywordRetriever, RAGService, load_documents
 from agent_learning.llm.streaming import StreamingService
@@ -64,6 +66,29 @@ def test_ch03_example_is_opt_in_and_safe_without_api_key(monkeypatch, capsys):
     assert "OpenAI integration is disabled." in output
     assert "RUN_AGENT_LEARNING_INTEGRATION=1" in output
     assert "final answer: Fake OpenAI-style answer from chapter 03." in output
+
+
+def test_ch03_provider_config_supports_anthropic(monkeypatch):
+    monkeypatch.setenv("AGENT_LEARNING_PROVIDER", "anthropic")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "anthropic-key")
+    monkeypatch.setenv("ANTHROPIC_MODEL", "claude-test")
+    monkeypatch.setenv("OPENAI_API_KEY", "openai-key")
+    monkeypatch.setenv("OPENAI_MODEL", "openai-test")
+
+    config = load_provider_config_from_env()
+
+    assert config.provider == "anthropic"
+    assert config.anthropic == AnthropicConfig(api_key="anthropic-key", model="claude-test")
+    assert config.openai == OpenAIConfig(api_key="openai-key", model="openai-test", base_url="")
+    assert config.active_api_key == "anthropic-key"
+    assert config.active_model == "claude-test"
+
+
+def test_ch03_provider_config_rejects_unknown_provider(monkeypatch):
+    monkeypatch.setenv("AGENT_LEARNING_PROVIDER", "unknown")
+
+    with pytest.raises(ValueError, match="unsupported provider"):
+        load_provider_config_from_env()
 
 
 def test_ch04_calculator_supports_safe_arithmetic_and_rejects_calls():
@@ -288,6 +313,29 @@ def test_ch11_react_agent_rejects_blank_question():
 
     with pytest.raises(ValueError, match="question must not be blank"):
         service.run(ReActAgentInput(question="  "))
+
+
+def test_ch11_example_uses_opt_in_provider_selection(monkeypatch, capsys):
+    example = _load_example("ch11_react_agent.py")
+    config = ModelProviderConfig(
+        provider="openai",
+        openai=OpenAIConfig(api_key="set", model="openai-test", base_url=""),
+        anthropic=AnthropicConfig(api_key="", model="claude-test"),
+    )
+
+    def fake_select_chat_model(fake_response: str):
+        return ExampleModelSelection("openai", FakeChatModel(fake_response), config, True)
+
+    monkeypatch.setattr(example, "select_chat_model", fake_select_chat_model)
+    monkeypatch.setattr(sys, "argv", ["ch11_react_agent.py", "12 * (7 + 3)"])
+
+    example.main()
+
+    output = capsys.readouterr().out
+    assert "mode: openai" in output
+    assert "provider: openai" in output
+    assert 'RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=openai' in output
+    assert "final answer: 12 * (7 + 3) = 120" in output
 
 
 def test_integration_flag_example_is_opt_in():
