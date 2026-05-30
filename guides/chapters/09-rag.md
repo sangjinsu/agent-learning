@@ -44,7 +44,7 @@ uv run python examples/ch09_rag.py "streaming chunk final answer user interface"
 CLI에서 확인할 부분:
 
 - `retrieved sources`에 질문과 관련된 문서 title, source, score가 표시되는지 확인합니다.
-- `prompt messages`에 retrieved context가 포함되는지 확인합니다.
+- `--verbose` 출력에서 `prompt messages`에 retrieved context가 포함되는지 확인합니다.
 - `final answer`가 sources를 근거로 출력되는지 확인합니다.
 
 테스트:

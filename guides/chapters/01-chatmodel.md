@@ -23,7 +23,8 @@ uv run python examples/ch01_chatmodel.py "What is LangChain?"
 CLI에서 확인할 부분:
 
 - `mode: fake`로 외부 API 없이 실행되는지 확인합니다.
-- `prompt messages`에 user question이 들어가는지 확인합니다.
+- 기본 출력에서 question과 final answer를 확인합니다.
+- `--verbose` 출력에서 `prompt messages`에 user question이 들어가는지 확인합니다.
 - `final answer`가 fake model의 deterministic answer로 출력되는지 확인합니다.
 
 테스트:

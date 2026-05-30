@@ -47,13 +47,14 @@ uv run python examples/ch10_mcp.py mcp
 - `full`: discover, resource, prompt, tool 흐름을 한 번에 실행합니다.
 - `mcp`: 기존 명령과의 호환을 위해 `full`과 같은 흐름을 실행합니다.
 
-출력에는 `mcp call trace:`가 포함되어 실제 client request와 server response 흐름을 단계별로 보여 줍니다.
+기본 출력은 실행된 MCP primitive 결과를 짧게 보여 줍니다. `--verbose` 출력에는 `mcp call trace:`가 포함되어 실제 client request와 server response 흐름을 단계별로 보여 줍니다.
 
 ## 확인할 출력/테스트
 
 CLI에서 확인할 부분:
 
-- `mcp call trace:`에서 client request와 server response 흐름을 단계별로 확인합니다.
+- 기본 출력에서 flow와 primitive 결과를 확인합니다.
+- `--verbose` 출력의 `mcp call trace:`에서 client request와 server response 흐름을 단계별로 확인합니다.
 - `discover`는 tool, resource template, prompt 목록을 보여 주는지 확인합니다.
 - `resource`, `prompt`, `tool` mode가 각각 read/get/call 흐름을 분리해서 보여 주는지 확인합니다.
 
@@ -63,4 +64,5 @@ CLI에서 확인할 부분:
 uv run pytest tests/test_chapters.py::test_ch10_mcp_demo_exposes_tool_resource_and_prompt_over_stdio -q
 uv run pytest tests/test_chapters.py::test_ch10_mcp_demo_supports_focused_flows -q
 uv run pytest tests/test_examples.py::test_ch10_mcp_tool_mode_prints_actual_tool_call_trace -q
+uv run pytest tests/test_examples.py::test_ch10_mcp_tool_mode_verbose_prints_actual_tool_call_trace -q
 ```

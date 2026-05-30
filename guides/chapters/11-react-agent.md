@@ -30,6 +30,7 @@ flowchart LR
 ```bash
 uv run python examples/ch11_react_agent.py "12 * (7 + 3)"
 uv run python examples/ch11_react_agent.py "What is ReAct?"
+uv run python examples/ch11_react_agent.py --verbose "12 * (7 + 3)"
 RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=openai uv run python examples/ch11_react_agent.py "12 * (7 + 3)"
 RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=anthropic uv run python examples/ch11_react_agent.py "12 * (7 + 3)"
 ```
@@ -38,10 +39,8 @@ RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=anthropic uv run python
 
 CLI에서 확인할 부분:
 
-- `graph nodes`: LangGraph node와 edge 구조
-- `react steps`: reasoning, action, observation, final 단계
-- `messages`: user, ai tool call, tool observation, final ai answer 순서
-- `config`: 실제 provider mode에서 선택된 provider와 API key 설정 여부
+- 기본 출력: `react agent:`, `mode:`, `tool:`, `steps:`, `final answer:`
+- `--verbose`: graph nodes, react steps, messages, provider config
 
 테스트:
 
@@ -49,6 +48,7 @@ CLI에서 확인할 부분:
 uv run pytest tests/test_chapters.py::test_ch11_react_agent_runs_reason_action_observation_loop -q
 uv run pytest tests/test_chapters.py::test_ch11_react_agent_rejects_blank_question -q
 uv run pytest tests/test_chapters.py::test_ch11_example_uses_opt_in_provider_selection -q
-uv run pytest tests/test_examples.py::test_all_examples_print_detailed_learning_trace -q
+uv run pytest tests/test_examples.py::test_all_examples_print_concise_output_by_default -q
+uv run pytest tests/test_examples.py::test_all_examples_preserve_detailed_learning_trace_with_verbose -q
 RUN_AGENT_LEARNING_INTEGRATION=1 uv run pytest tests/test_provider_integration.py::test_selected_provider_react_agent_integration -v
 ```

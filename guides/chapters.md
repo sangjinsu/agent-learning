@@ -8,7 +8,7 @@
 
 - 기본 실행은 fake model 또는 local testdata만 사용합니다.
 - 실제 provider 연동은 `RUN_AGENT_LEARNING_INTEGRATION=1`일 때만 실행합니다.
-- 예제 CLI는 `mode:`, 학습 목표, 실행 흐름, 중요한 이유, 다음 실습을 함께 출력합니다.
+- 예제 CLI 기본 출력은 `mode:`와 핵심 결과만 짧게 보여주고, 상세 학습 trace는 `--verbose`에서 출력합니다.
 - 새 chapter를 추가할 때는 code, example, tests, README, guides, docs를 같은 작업 단위에서 맞춥니다.
 
 ## Concept Mapping

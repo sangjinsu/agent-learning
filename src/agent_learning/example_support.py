@@ -24,6 +24,34 @@ class ExampleModelSelection:
     integration_requested: bool
 
 
+@dataclass(frozen=True)
+class ExampleArgs:
+    question: str
+    verbose: bool
+
+
+def parse_example_args(args: Iterable[str], default_question: str) -> ExampleArgs:
+    verbose = False
+    positional: list[str] = []
+    for arg in args:
+        if arg == "--verbose":
+            verbose = True
+            continue
+        positional.append(arg)
+    return ExampleArgs(" ".join(positional) or default_question, verbose)
+
+
+def split_verbose_flag(args: Iterable[str]) -> tuple[list[str], bool]:
+    verbose = False
+    positional: list[str] = []
+    for arg in args:
+        if arg == "--verbose":
+            verbose = True
+            continue
+        positional.append(arg)
+    return positional, verbose
+
+
 def select_chat_model(fake_response: str) -> ExampleModelSelection:
     config = load_provider_config_from_env()
     requested = integration_enabled()
@@ -61,8 +89,17 @@ def print_learning_sections(
         print(f"- {item}")
 
 
-def print_model_selection(selection: ExampleModelSelection) -> None:
+def print_model_selection(selection: ExampleModelSelection, *, verbose: bool = True) -> None:
     print(f"mode: {selection.mode}")
+    if not verbose:
+        print(f"provider: {selection.config.provider}")
+        if selection.mode == "fake":
+            if selection.integration_requested:
+                print(f"note: {selection.config.active_api_key_name} is missing; using fake fallback.")
+            else:
+                print("note: external API disabled; using fake fallback.")
+        return
+
     print("config:")
     print(f"- provider: {selection.config.provider}")
     print(f"- integration_requested: {_bool_text(selection.integration_requested)}")

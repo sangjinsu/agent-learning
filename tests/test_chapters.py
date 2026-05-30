@@ -63,8 +63,7 @@ def test_ch03_example_is_opt_in_and_safe_without_api_key(monkeypatch, capsys):
 
     output = capsys.readouterr().out
     assert "mode: fake" in output
-    assert "OpenAI integration is disabled." in output
-    assert "RUN_AGENT_LEARNING_INTEGRATION=1" in output
+    assert "note: external API disabled; using fake fallback." in output
     assert "final answer: Fake OpenAI-style answer from chapter 03." in output
 
 
@@ -334,7 +333,7 @@ def test_ch11_example_uses_opt_in_provider_selection(monkeypatch, capsys):
     output = capsys.readouterr().out
     assert "mode: openai" in output
     assert "provider: openai" in output
-    assert 'RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=openai' in output
+    assert "steps:" in output
     assert "final answer: 12 * (7 + 3) = 120" in output
 
 

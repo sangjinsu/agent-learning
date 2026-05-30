@@ -27,7 +27,8 @@ RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=anthropic uv run python
 CLI에서 확인할 부분:
 
 - integration flag가 없으면 fake fallback으로 실행되어 실제 API를 호출하지 않는지 확인합니다.
-- `prompt messages`와 `final answer`가 Chapter 01-02와 같은 service 경계에서 출력되는지 확인합니다.
+- 기본 출력에서 provider, question, final answer를 확인합니다.
+- `--verbose` 출력에서 `prompt messages`가 Chapter 01-02와 같은 service 경계로 만들어지는지 확인합니다.
 - `RUN_AGENT_LEARNING_INTEGRATION=1`일 때만 실제 provider 호출 경로를 확인합니다.
 
 테스트:

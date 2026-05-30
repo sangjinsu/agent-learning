@@ -23,8 +23,8 @@ uv run python examples/ch05_chain.py "How does Chain work?"
 
 CLI에서 확인할 부분:
 
-- `chain input`에서 runnable에 전달되는 입력 변수를 확인합니다.
-- `prompt messages`에서 prompt template 결과를 확인합니다.
+- 기본 출력에서 prompt message count와 final answer를 확인합니다.
+- `--verbose` 출력에서 runnable input, prompt messages, model response를 확인합니다.
 - `final answer`가 `ChatPromptTemplate -> ChatModel` chain 결과로 출력되는지 확인합니다.
 
 테스트:

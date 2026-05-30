@@ -103,17 +103,23 @@ testdata/docs/ch09-rag/   # RAG용 local 문서
 - MCP: `FastMCP` server와 stdio client session으로 tool/resource/prompt를 노출하고 호출합니다.
 - ReAct Agent: LangGraph loop로 reasoning, action, observation, final answer를 연결합니다.
 
-## CLI Trace
+## CLI Output
 
-모든 chapter 예제는 단순한 답변 한 줄 대신 학습용 trace를 출력합니다.
+모든 chapter 예제는 기본적으로 결과 중심의 짧은 출력을 보여줍니다.
 
-- `mode:`: fake/local/integration 실행 모드
-- `learning goal:` / `학습 목표:`: chapter에서 관찰할 핵심 목표
-- `what happens:` / `실행 흐름:`: 입력이 component를 지나며 바뀌는 단계
-- `why it matters:` / `중요한 이유:`: 실제 agent 애플리케이션에서 중요한 이유
-- `try next:` / `다음 실습:`: 같은 예제를 변형해 볼 수 있는 실습
+- 첫 줄: chapter 성격을 나타내는 짧은 label. 예: `rag:`, `mcp demo:`, `react agent:`
+- `mode:`: fake/local/provider 실행 모드
+- 핵심 결과: retrieved sources, selected route, tool result, step summary 같은 chapter별 요약
+- `final answer:`: 최종 응답 또는 완료 결과
 
-그 뒤에는 chapter 성격에 따라 prompt messages, tool calls, graph route, stream chunks, callback events, retrieved sources, MCP call trace, ReAct steps, final answer를 단계별로 출력합니다.
+상세 학습 trace가 필요하면 `--verbose`를 붙입니다.
+
+```bash
+uv run python examples/ch09_rag.py --verbose "Chapter 8 callback은 RAG에서 어떤 흐름을 관찰하나요?"
+uv run python examples/ch11_react_agent.py --verbose "12 * (7 + 3)"
+```
+
+`--verbose` 출력에는 learning goal, 실행 흐름, prompt messages, tool calls, graph route, stream chunks, callback events, MCP call trace, ReAct steps가 포함됩니다.
 
 ## Environment
 

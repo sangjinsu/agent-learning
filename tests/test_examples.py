@@ -26,37 +26,27 @@ def run_example(filename: str, *args: str) -> str:
     return completed.stdout
 
 
-def test_all_examples_print_detailed_learning_trace():
+def test_all_examples_print_concise_output_by_default():
     examples = {
-        "ch01_chatmodel.py": ["mode:", "question:", "prompt messages:", "final answer:"],
-        "ch02_prompt_template.py": ["mode:", "input variables:", "formatted messages:"],
-        "ch03_openai_chatmodel.py": ["mode:", "config:", "prompt messages:", "final answer:"],
-        "ch04_tool_calling.py": ["mode:", "tool schema:", "model tool calls:", "tool messages:", "final answer:"],
-        "ch05_chain.py": ["mode:", "input variables:", "prompt messages:", "model response:", "final answer:"],
-        "ch06_graph.py": ["mode:", "graph:", "selected route:", "final answer:"],
-        "ch07_streaming.py": ["mode:", "prompt messages:", "stream chunks:", "final answer:"],
-        "ch08_callback_observability.py": ["mode:", "callback events:", "final answer:"],
-        "ch09_rag.py": ["mode:", "loaded documents:", "retrieved sources:", "prompt context summary:", "final answer:"],
+        "ch01_chatmodel.py": ["chatmodel:", "mode:", "question:", "final answer:"],
+        "ch02_prompt_template.py": ["prompt template:", "mode:", "message count:"],
+        "ch03_openai_chatmodel.py": ["provider chatmodel:", "mode:", "provider:", "final answer:"],
+        "ch04_tool_calling.py": ["tool calling:", "mode:", "tool:", "final answer:"],
+        "ch05_chain.py": ["chain:", "mode:", "prompt message count:", "final answer:"],
+        "ch06_graph.py": ["graph:", "mode:", "selected route:", "final answer:"],
+        "ch07_streaming.py": ["streaming:", "mode:", "chunk count:", "final answer:"],
+        "ch08_callback_observability.py": ["observability:", "mode:", "event count:", "final answer:"],
+        "ch09_rag.py": ["rag:", "mode:", "retrieved sources:", "final answer:"],
         "ch10_mcp.py": [
+            "mcp demo:",
             "mode:",
-            "mcp flow:",
-            "target chapter:",
-            "server transport:",
-            "mcp call trace:",
-            "client -> initialize",
-            "available tools:",
-            "available resources:",
-            "available prompts:",
-            "tool result:",
+            "flow:",
             "final answer:",
         ],
         "ch11_react_agent.py": [
+            "react agent:",
             "mode:",
-            "graph nodes:",
-            "react steps:",
-            "reasoning:",
-            "action:",
-            "observation:",
+            "steps:",
             "final answer:",
         ],
     }
@@ -72,19 +62,72 @@ def test_all_examples_print_detailed_learning_trace():
         "다음 실습:",
     ]
 
+    verbose_only_sections = [
+        *friendly_sections,
+        "what happens:",
+        "prompt messages:",
+        "model response:",
+        "mcp call trace:",
+        "graph nodes:",
+        "react steps:",
+    ]
+
     for filename, expected_parts in examples.items():
         output = run_example(filename)
-        for expected in [*friendly_sections, *expected_parts]:
+        for expected in expected_parts:
             assert expected in output, f"{filename} output did not include {expected!r}:\n{output}"
+        for verbose_only in verbose_only_sections:
+            assert verbose_only not in output, f"{filename} default output included verbose section {verbose_only!r}:\n{output}"
+
+
+def test_all_examples_preserve_detailed_learning_trace_with_verbose():
+    examples = {
+        "ch01_chatmodel.py": ["prompt messages:", "final answer:"],
+        "ch02_prompt_template.py": ["input variables:", "formatted messages:"],
+        "ch03_openai_chatmodel.py": ["config:", "prompt messages:", "final answer:"],
+        "ch04_tool_calling.py": ["tool schema:", "model tool calls:", "tool messages:", "final answer:"],
+        "ch05_chain.py": ["input variables:", "model response:", "final answer:"],
+        "ch06_graph.py": ["graph:", "model response:", "final answer:"],
+        "ch07_streaming.py": ["stream chunks:", "final answer:"],
+        "ch08_callback_observability.py": ["callback events:", "final answer:"],
+        "ch09_rag.py": ["loaded documents:", "prompt context summary:", "prompt messages:", "final answer:"],
+        "ch10_mcp.py": ["mcp call trace:", "available tools:", "tool result:", "final answer:"],
+        "ch11_react_agent.py": ["graph nodes:", "react steps:", "observation:", "final answer:"],
+    }
+
+    friendly_sections = [
+        "learning goal:",
+        "what happens:",
+        "why it matters:",
+        "try next:",
+        "학습 목표:",
+        "실행 흐름:",
+        "중요한 이유:",
+        "다음 실습:",
+    ]
+
+    for filename, expected_parts in examples.items():
+        output = run_example(filename, "--verbose")
+        for expected in [*friendly_sections, *expected_parts]:
+            assert expected in output, f"{filename} --verbose output did not include {expected!r}:\n{output}"
 
 
 def test_ch10_mcp_tool_mode_prints_actual_tool_call_trace():
     output = run_example("ch10_mcp.py", "tool")
 
-    assert "mcp flow: tool" in output
+    assert "mcp demo:" in output
+    assert "flow: tool" in output
     assert "target chapter: tool" in output
-    assert "client -> call_tool name=summarize_chapter arguments={'chapter': 'tool'}" in output
-    assert "server -> tool result:" in output
     assert "MCP tools are callable actions" in output
+    assert "mcp call trace:" not in output
     assert "resource content:" not in output
     assert "prompt messages:" not in output
+
+
+def test_ch10_mcp_tool_mode_verbose_prints_actual_tool_call_trace():
+    output = run_example("ch10_mcp.py", "tool", "--verbose")
+
+    assert "flow: tool" in output
+    assert "client -> call_tool name=summarize_chapter arguments={'chapter': 'tool'}" in output
+    assert "server -> tool result:" in output
+    assert "tool result:" in output
