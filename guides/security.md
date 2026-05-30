@@ -16,3 +16,4 @@
 
 - Chapter 09 RAG는 `testdata/docs/ch09-rag`의 local text data만 읽습니다.
 - Chapter 10 MCP는 local stdio demo이며 remote connector auth나 production deployment를 다루지 않습니다.
+- Chapter 11 ReAct Agent는 calculator tool만 등록하며 shell/filesystem/deployment action을 실행하지 않습니다.

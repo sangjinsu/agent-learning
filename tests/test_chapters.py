@@ -260,6 +260,36 @@ def test_ch10_mcp_demo_rejects_unknown_chapter():
         normalize_flow("unknown")
 
 
+def test_ch11_react_agent_runs_reason_action_observation_loop():
+    from agent_learning.llm.react_agent import ReActAgentInput, ReActAgentService
+
+    service = ReActAgentService(FakeChatModel("unused"), [calculator_tool()])
+
+    result = service.run(ReActAgentInput(question="12 * (7 + 3)"))
+
+    assert result.answer == "12 * (7 + 3) = 120"
+    assert [step.phase for step in result.steps] == [
+        "reasoning",
+        "action",
+        "observation",
+        "final",
+    ]
+    assert result.steps[1].name == "calculator"
+    assert result.tool_messages
+    assert result.tool_messages[0].name == "calculator"
+    assert isinstance(result.messages[0], HumanMessage)
+    assert isinstance(result.messages[2], ToolMessage)
+
+
+def test_ch11_react_agent_rejects_blank_question():
+    from agent_learning.llm.react_agent import ReActAgentInput, ReActAgentService
+
+    service = ReActAgentService(FakeChatModel("unused"), [calculator_tool()])
+
+    with pytest.raises(ValueError, match="question must not be blank"):
+        service.run(ReActAgentInput(question="  "))
+
+
 def test_integration_flag_example_is_opt_in():
     if not integration_enabled():
         pytest.skip("set RUN_AGENT_LEARNING_INTEGRATION=1 in the environment or .env to call external APIs")

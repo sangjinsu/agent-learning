@@ -16,7 +16,7 @@ uv lock --check
 2. `tests/test_chapters.py`에 behavior test를 추가합니다.
 3. `examples/chXX_*.py`에 학습용 CLI trace를 추가합니다.
 4. 필요할 때만 `tests/test_openai_integration.py`에 opt-in integration test를 추가합니다.
-5. README, `guides/chapters.md`, roadmap/progress/notes를 함께 업데이트합니다.
+5. README, `guides/chapters.md`, `guides/chapters/<chapter>.md`, roadmap/progress/notes를 함께 업데이트합니다.
 
 ## Integration Verification
 

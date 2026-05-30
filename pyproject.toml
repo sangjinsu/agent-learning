@@ -1,7 +1,7 @@
 [project]
 name = "agent-learning"
 version = "0.1.0"
-description = "Python LangGraph/LangChain/MCP learning project with chapters 01-10."
+description = "Python LangGraph/LangChain/MCP learning project with chapters 01-11."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

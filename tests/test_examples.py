@@ -48,6 +48,15 @@ def test_all_examples_print_detailed_learning_trace():
             "tool result:",
             "final answer:",
         ],
+        "ch11_react_agent.py": [
+            "mode:",
+            "graph nodes:",
+            "react steps:",
+            "reasoning:",
+            "action:",
+            "observation:",
+            "final answer:",
+        ],
     }
 
     friendly_sections = [
