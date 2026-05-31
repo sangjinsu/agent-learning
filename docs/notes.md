@@ -8,6 +8,15 @@
 - Chapter 09는 embedding/vector store 없이 in-memory keyword retrieval만 다룹니다.
 - Chapter 10은 local `stdio` transport로 MCP server process와 client session을 함께 실행합니다.
 - Chapter 11은 `llm_call -> tool_node -> llm_call` LangGraph loop로 ReAct 흐름을 보여줍니다.
+- Chapter 12는 `Agent -> GraphTool -> Graph nodes -> JSON observation -> Agent final answer` 흐름을 보여줍니다.
+
+```mermaid
+flowchart LR
+    AGENT["ReAct Agent"] --> TOOL["StructuredTool: devops_triage"]
+    TOOL --> GRAPH["LangGraph DevOps triage"]
+    GRAPH --> JSON["JSON observation"]
+    JSON --> AGENT
+```
 
 ## Documentation Notes
 

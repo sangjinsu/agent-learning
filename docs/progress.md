@@ -17,6 +17,7 @@
 | 09. RAG | 완료 | `uv run python examples/ch09_rag.py "Chapter 8 callback은 RAG에서 어떤 흐름을 관찰하나요?"` | 선택 | `uv run pytest tests/test_chapters.py::test_ch09_rag_retrieves_keyword_context_and_sources -q` |
 | 10. MCP | 완료 | `uv run python examples/ch10_mcp.py tool` | 불필요 | `uv run pytest tests/test_chapters.py::test_ch10_mcp_demo_supports_focused_flows -q` |
 | 11. ReAct Agent | 완료 | `uv run python examples/ch11_react_agent.py "12 * (7 + 3)"` | 선택 | `uv run pytest tests/test_chapters.py::test_ch11_react_agent_runs_reason_action_observation_loop -q` |
+| 12. GraphTool | 완료 | `uv run python examples/ch12_graphtool.py "triage checkout 500 errors increased in prod"` | 선택 | `uv run pytest tests/test_chapters.py::test_ch12_graphtool_react_agent_calls_devops_triage_graph -q` |
 
 ## 공통 검증
 

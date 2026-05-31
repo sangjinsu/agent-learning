@@ -63,6 +63,18 @@ class FakeChatModel(BaseChatModel):
                         }
                     ],
                 )
+            triage_args = _extract_triage_args(messages[-1].content)
+            if triage_args and any(tool.name == "devops_triage" for tool in self.bound_tools):
+                return AIMessage(
+                    content="",
+                    tool_calls=[
+                        {
+                            "name": "devops_triage",
+                            "args": triage_args,
+                            "id": "call_devops_triage_1",
+                        }
+                    ],
+                )
 
         return AIMessage(content=self.response)
 
@@ -123,7 +135,32 @@ def _final_answer_from_tool_message(message: ToolMessage) -> str:
 
     if "expression" in payload and "result" in payload:
         return f"{payload['expression']} = {_format_number(payload['result'])}"
+    if "severity" in payload and "summary" in payload:
+        actions = payload.get("next_actions") or []
+        action_text = "; ".join(str(action) for action in actions[:2])
+        return f"devops triage: severity {payload['severity']}; {payload['summary']} next actions: {action_text}"
     return str(message.content)
+
+
+def _extract_triage_args(content: Any) -> dict[str, str]:
+    text = str(content).strip()
+    lower = text.lower()
+    if "triage" not in lower and "incident" not in lower:
+        return {}
+
+    environment = "prod" if "prod" in lower or "production" in lower else "staging"
+    service = "checkout"
+    for candidate in ("checkout", "catalog", "payment", "payments", "search", "auth"):
+        if candidate in lower:
+            service = "payment" if candidate == "payments" else candidate
+            break
+
+    symptom = text
+    for prefix in ("triage ", "incident "):
+        if lower.startswith(prefix):
+            symptom = text[len(prefix) :].strip()
+            break
+    return {"symptom": symptom, "service": service, "environment": environment}
 
 
 def _format_number(value: Any) -> str:

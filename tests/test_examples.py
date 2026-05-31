@@ -49,6 +49,14 @@ def test_all_examples_print_concise_output_by_default():
             "steps:",
             "final answer:",
         ],
+        "ch12_graphtool.py": [
+            "graphtool:",
+            "mode:",
+            "registered tools:",
+            "input shape:",
+            "steps:",
+            "final answer:",
+        ],
     }
 
     friendly_sections = [
@@ -93,6 +101,7 @@ def test_all_examples_preserve_detailed_learning_trace_with_verbose():
         "ch09_rag.py": ["loaded documents:", "prompt context summary:", "prompt messages:", "final answer:"],
         "ch10_mcp.py": ["mcp call trace:", "available tools:", "tool result:", "final answer:"],
         "ch11_react_agent.py": ["graph nodes:", "react steps:", "observation:", "final answer:"],
+        "ch12_graphtool.py": ["graph nodes:", "tool schema:", "react steps:", "observation:", "final answer:"],
     }
 
     friendly_sections = [

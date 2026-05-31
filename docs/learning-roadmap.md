@@ -15,6 +15,7 @@
 9. **RAG**: keyword retriever, context prompt, source metadata에 집중합니다.
 10. **MCP**: FastMCP server와 stdio client로 tool, resource, prompt 호출 흐름을 보여줍니다.
 11. **ReAct Agent**: reasoning, action, observation loop로 model 판단과 tool 실행을 연결합니다.
+12. **GraphTool**: deterministic LangGraph workflow를 tool로 감싸 ReAct Agent action으로 호출합니다.
 
 ## Recommended Study Loop
 
@@ -34,10 +35,12 @@
 - Vector RAG: embedding provider와 vector store 도입
 - Remote MCP: local stdio 예제를 streamable HTTP connector로 확장
 - Evaluation: answer quality와 retrieval quality를 분리해 측정
+- Human-in-the-loop: tool 실행 전 승인/거절 gate를 추가
 
 ## Scope Boundaries
 
 - Chapter 09는 embedding/vector store 없이 local keyword retrieval만 다룹니다.
 - Chapter 10은 배포용 connector가 아니라 local stdio MCP 학습 예제입니다.
 - Chapter 11은 fake mode를 기본으로 두고, opt-in 실제 provider 모델로도 ReAct loop를 관찰합니다.
+- Chapter 12는 DevOps triage graph를 local `StructuredTool`로 감싸며 production action은 실행하지 않습니다.
 - shell, filesystem mutation, deployment tool은 초반 chapter에 등록하지 않습니다.

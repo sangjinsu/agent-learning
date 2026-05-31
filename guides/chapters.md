@@ -25,6 +25,7 @@ Go판 Eino component 개념은 Python에서 다음처럼 대응합니다.
 | `Retriever` | `InMemoryKeywordRetriever` |
 | `MCP server` | `FastMCP` + `ClientSession` stdio demo |
 | `Agent` | LangGraph `llm_call -> tool_node -> llm_call` ReAct loop |
+| `GraphTool` | LangGraph subgraph wrapped as a LangChain `StructuredTool` |
 
 ## Chapter Index
 
@@ -41,6 +42,7 @@ Go판 Eino component 개념은 Python에서 다음처럼 대응합니다.
 | 09 | RAG | [09-rag.md](chapters/09-rag.md) | `examples/ch09_rag.py` | `test_ch09_rag_retrieves_keyword_context_and_sources` |
 | 10 | MCP | [10-mcp.md](chapters/10-mcp.md) | `examples/ch10_mcp.py` | `test_ch10_mcp_demo_exposes_tool_resource_and_prompt_over_stdio` |
 | 11 | ReAct Agent | [11-react-agent.md](chapters/11-react-agent.md) | `examples/ch11_react_agent.py` | `test_ch11_react_agent_runs_reason_action_observation_loop` |
+| 12 | GraphTool | [12-graphtool.md](chapters/12-graphtool.md) | `examples/ch12_graphtool.py` | `test_ch12_graphtool_react_agent_calls_devops_triage_graph` |
 
 ## Integration Coverage
 
@@ -53,3 +55,4 @@ Go판 Eino component 개념은 Python에서 다음처럼 대응합니다.
 - Chapter 09: keyword RAG, context prompt, source metadata
 - Chapter 10: local MCP stdio server/client, tool/resource/prompt
 - Chapter 11: local ReAct loop with calculator action and tool observation
+- Chapter 12: DevOps triage LangGraph wrapped as a ReAct Agent tool action

@@ -5,6 +5,7 @@
 - `src/agent_learning/fake.py`: 외부 API 없는 fake chat/streaming model
 - `src/agent_learning/llm/`: chapter별 LangChain/LangGraph service
 - `src/agent_learning/llm/react_agent.py`: Chapter 11 ReAct graph service
+- `src/agent_learning/llm/devops_triage.py`: Chapter 12 DevOps triage graph service
 - `src/agent_learning/tools/`: calculator 같은 local tool
 - `src/agent_learning/mcp_demo.py`: local MCP stdio server/client demo
 - `examples/`: chapter 실행 entrypoint

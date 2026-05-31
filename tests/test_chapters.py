@@ -337,6 +337,118 @@ def test_ch11_example_uses_opt_in_provider_selection(monkeypatch, capsys):
     assert "final answer: 12 * (7 + 3) = 120" in output
 
 
+def test_ch12_graph_tool_wraps_runnable_and_returns_json_ready_dict():
+    from langchain_core.runnables import RunnableLambda
+
+    from agent_learning.tools.graph_tool import graph_tool_from_runnable
+    from agent_learning.llm.devops_triage import TriageInput
+
+    tool = graph_tool_from_runnable(
+        name="echo_triage",
+        description="Echo a triage input through a runnable graph.",
+        args_schema=TriageInput,
+        runnable=RunnableLambda(lambda value: {**value, "severity": "low"}),
+    )
+
+    result = tool.invoke(
+        {
+            "symptom": "latency is slightly elevated",
+            "service": "catalog",
+            "environment": "staging",
+        },
+    )
+
+    assert result == {
+        "symptom": "latency is slightly elevated",
+        "service": "catalog",
+        "environment": "staging",
+        "severity": "low",
+    }
+
+
+def test_ch12_graph_tool_rejects_missing_runnable():
+    from agent_learning.tools.graph_tool import graph_tool_from_runnable
+    from agent_learning.llm.devops_triage import TriageInput
+
+    with pytest.raises(ValueError, match="runnable is required"):
+        graph_tool_from_runnable(
+            name="broken",
+            description="Broken graph tool.",
+            args_schema=TriageInput,
+            runnable=None,
+        )
+
+
+def test_ch12_graph_tool_reports_runnable_errors():
+    from langchain_core.runnables import RunnableLambda
+
+    from agent_learning.tools.graph_tool import graph_tool_from_runnable
+    from agent_learning.llm.devops_triage import TriageInput
+
+    def fail(_value):
+        raise RuntimeError("graph failed")
+
+    tool = graph_tool_from_runnable(
+        name="broken_triage",
+        description="Broken triage graph.",
+        args_schema=TriageInput,
+        runnable=RunnableLambda(fail),
+    )
+
+    with pytest.raises(ValueError, match="runnable failed: graph failed"):
+        tool.invoke(
+            {
+                "symptom": "checkout 500 errors increased",
+                "service": "checkout",
+                "environment": "prod",
+            },
+        )
+
+
+def test_ch12_devops_triage_graph_generates_deterministic_actions():
+    from agent_learning.llm.devops_triage import run_devops_triage
+
+    result = run_devops_triage(
+        {
+            "symptom": "checkout 500 errors increased",
+            "service": "checkout",
+            "environment": "prod",
+        },
+    )
+
+    assert result["severity"] == "high"
+    assert result["suspected_area"] == "checkout application errors"
+    assert result["next_actions"] == [
+        "page the checkout on-call",
+        "check recent checkout deploys in prod",
+        "inspect prod checkout error logs",
+        "prepare rollback if customer impact continues",
+    ]
+    assert "checkout" in result["summary"]
+
+
+def test_ch12_graphtool_react_agent_calls_devops_triage_graph():
+    from agent_learning.llm.devops_triage import devops_triage_tool
+    from agent_learning.llm.react_agent import ReActAgentInput, ReActAgentService
+
+    service = ReActAgentService(FakeChatModel("unused"), [devops_triage_tool()])
+
+    result = service.run(
+        ReActAgentInput(question="triage checkout 500 errors increased in prod"),
+    )
+
+    assert "severity high" in result.answer
+    assert [step.phase for step in result.steps] == [
+        "reasoning",
+        "action",
+        "observation",
+        "final",
+    ]
+    assert result.steps[1].name == "devops_triage"
+    assert result.tool_messages
+    assert result.tool_messages[0].name == "devops_triage"
+
+
 def test_integration_flag_example_is_opt_in():
     if not integration_enabled():
         pytest.skip("set RUN_AGENT_LEARNING_INTEGRATION=1 in the environment or .env to call external APIs")

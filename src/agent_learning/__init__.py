@@ -1,1 +1,1 @@
-"""LangGraph/LangChain learning examples for chapters 01-11."""
+"""LangGraph/LangChain learning examples for chapters 01-12."""
