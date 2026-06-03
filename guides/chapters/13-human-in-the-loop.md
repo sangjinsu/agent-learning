@@ -16,14 +16,32 @@
 
 ## 흐름
 
+이 장의 핵심은 graph가 한 번에 끝나지 않는다는 점입니다. 첫 실행은
+`approval_gate`에서 멈추고, caller가 사람의 결정을 받은 뒤 같은 `thread_id`로
+다시 실행해야 `record_decision`까지 진행됩니다.
+
 ```mermaid
-flowchart LR
-    START["START"] --> GATE["approval_gate"]
-    GATE --> INTERRUPT["interrupt payload"]
-    HUMAN["human decision"] --> RESUME["Command resume"]
-    RESUME --> RECORD["record_decision"]
-    RECORD --> FINAL["approved/rejected result"]
+sequenceDiagram
+    participant Caller as caller / CLI
+    participant Graph as LangGraph
+    participant Human as human reviewer
+
+    Caller->>Graph: invoke(initial incident, thread_id)
+    Graph->>Graph: approval_gate
+    Graph-->>Caller: interrupt payload
+    Caller->>Human: show recommended action
+    Human-->>Caller: approve or reject
+    Caller->>Graph: invoke(Command(resume=decision), same thread_id)
+    Graph->>Graph: record_decision
+    Graph-->>Caller: approved/rejected result
 ```
+
+단계로 풀면 다음과 같습니다.
+
+1. `approval_gate`가 recommended action을 interrupt payload로 노출합니다.
+2. caller는 이 payload를 사람에게 보여주고 승인/거절 decision을 받습니다.
+3. caller는 `Command(resume=decision)`을 같은 `thread_id`로 다시 보냅니다.
+4. `record_decision`은 decision만 기록하고 실제 production action은 실행하지 않습니다.
 
 ## 실행 명령
 
