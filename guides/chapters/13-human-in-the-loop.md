@@ -22,18 +22,18 @@
 
 ```mermaid
 sequenceDiagram
-    participant Caller as caller / CLI
+    participant Caller as 호출자(CLI)
     participant Graph as LangGraph
-    participant Human as human reviewer
+    participant Human as 사람 리뷰어
 
-    Caller->>Graph: invoke(initial incident, thread_id)
-    Graph->>Graph: approval_gate
-    Graph-->>Caller: interrupt payload
-    Caller->>Human: show recommended action
-    Human-->>Caller: approve or reject
-    Caller->>Graph: invoke(Command(resume=decision), same thread_id)
-    Graph->>Graph: record_decision
-    Graph-->>Caller: approved/rejected result
+    Caller->>Graph: 초기 incident와 thread_id로 실행
+    Graph->>Graph: approval_gate 실행
+    Graph-->>Caller: interrupt payload 반환
+    Caller->>Human: recommended action 표시
+    Human-->>Caller: 승인 또는 거절 결정
+    Caller->>Graph: 같은 thread_id로 Command(resume=decision) 실행
+    Graph->>Graph: record_decision 실행
+    Graph-->>Caller: approved/rejected 결과 반환
 ```
 
 단계로 풀면 다음과 같습니다.
