@@ -2,7 +2,7 @@
 
 - 모든 보고는 한국어로 합니다.
 - 코드 주석은 영어로 유지합니다.
-- 이 저장소는 Python 3.11+, `uv`, LangChain, LangGraph, MCP 기반의 Chapter 01-12 학습 저장소입니다.
+- 이 저장소는 Python 3.11+, `uv`, LangChain, LangGraph, MCP 기반의 Chapter 01-13 학습 저장소입니다.
 
 ## Safety
 
@@ -14,12 +14,13 @@
 
 ## Example Policy
 
-- `examples/ch01_*.py`부터 `examples/ch12_*.py`까지의 기본 출력은 결과 중심으로 짧게 유지합니다.
+- `examples/ch01_*.py`부터 `examples/ch13_*.py`까지의 기본 출력은 결과 중심으로 짧게 유지합니다.
 - 상세 학습 trace가 필요할 때만 `--verbose`를 사용합니다.
 - Chapter 09 RAG는 `testdata/docs/ch09-rag`의 local 문서만 읽습니다.
 - Chapter 10 MCP는 local stdio demo이며 remote connector나 production deployment를 다루지 않습니다.
 - Chapter 11 ReAct Agent는 calculator tool만 사용하며 shell/filesystem/deployment action은 추가하지 않습니다.
 - Chapter 12 GraphTool은 DevOps triage 권고만 생성하며 실제 paging/rollback/deployment action은 추가하지 않습니다.
+- Chapter 13 Human-in-the-loop은 incident approval decision만 기록하며 실제 paging/rollback/deployment action은 추가하지 않습니다.
 
 ## Docs and Chapters
 

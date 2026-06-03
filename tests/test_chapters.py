@@ -449,6 +449,94 @@ def test_ch12_graphtool_react_agent_calls_devops_triage_graph():
     assert result.tool_messages[0].name == "devops_triage"
 
 
+def test_ch13_incident_gate_approves_recommended_action_without_side_effects():
+    from agent_learning.llm.human_in_loop import (
+        IncidentApprovalDecision,
+        IncidentApprovalInput,
+        run_incident_approval_demo,
+    )
+
+    result = run_incident_approval_demo(
+        IncidentApprovalInput(
+            symptom="checkout 500 errors increased",
+            service="checkout",
+            environment="prod",
+            recommended_action="page the checkout on-call",
+        ),
+        IncidentApprovalDecision(approved=True, reason="customer impact is confirmed"),
+    )
+
+    assert result.status == "approved"
+    assert result.final_answer == "approved: page the checkout on-call for checkout in prod."
+    assert result.interrupt_payload == {
+        "question": "Approve this incident action?",
+        "service": "checkout",
+        "environment": "prod",
+        "symptom": "checkout 500 errors increased",
+        "recommended_action": "page the checkout on-call",
+    }
+    assert result.trace == [
+        "graph -> approval_gate",
+        "interrupt -> approval requested",
+        "resume -> approved",
+        "graph -> record_decision",
+        "side_effects -> none",
+    ]
+
+
+def test_ch13_incident_gate_rejects_recommended_action_with_reason():
+    from agent_learning.llm.human_in_loop import (
+        IncidentApprovalDecision,
+        IncidentApprovalInput,
+        run_incident_approval_demo,
+    )
+
+    result = run_incident_approval_demo(
+        IncidentApprovalInput(
+            symptom="catalog latency is elevated",
+            service="catalog",
+            environment="staging",
+            recommended_action="open an incident note",
+        ),
+        IncidentApprovalDecision(approved=False, reason="watch dashboards first"),
+    )
+
+    assert result.status == "rejected"
+    assert result.final_answer == "rejected: open an incident note for catalog in staging. reason: watch dashboards first"
+    assert "resume -> rejected" in result.trace
+    assert result.decision_reason == "watch dashboards first"
+
+
+def test_ch13_incident_gate_rejects_blank_inputs():
+    from agent_learning.llm.human_in_loop import (
+        IncidentApprovalDecision,
+        IncidentApprovalInput,
+        run_incident_approval_demo,
+    )
+
+    with pytest.raises(ValueError, match="symptom must not be blank"):
+        run_incident_approval_demo(
+            IncidentApprovalInput(
+                symptom="  ",
+                service="checkout",
+                environment="prod",
+                recommended_action="page the checkout on-call",
+            ),
+            IncidentApprovalDecision(approved=True, reason="confirmed"),
+        )
+
+    with pytest.raises(ValueError, match="recommended action must not be blank"):
+        run_incident_approval_demo(
+            IncidentApprovalInput(
+                symptom="checkout 500 errors increased",
+                service="checkout",
+                environment="prod",
+                recommended_action=" ",
+            ),
+            IncidentApprovalDecision(approved=True, reason="confirmed"),
+        )
+
+
 def test_integration_flag_example_is_opt_in():
     if not integration_enabled():
         pytest.skip("set RUN_AGENT_LEARNING_INTEGRATION=1 in the environment or .env to call external APIs")

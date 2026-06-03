@@ -53,6 +53,7 @@ uv run python examples/ch10_mcp.py tool
 uv run python examples/ch10_mcp.py full
 uv run python examples/ch11_react_agent.py "12 * (7 + 3)"
 uv run python examples/ch12_graphtool.py "triage checkout 500 errors increased in prod"
+uv run python examples/ch13_human_in_loop.py "triage checkout 500 errors increased in prod"
 ```
 
 Chapter 11-12 agent 예제를 실제 모델로 실행하려면 integration flag와 provider key를 함께 설정합니다.
@@ -80,6 +81,7 @@ RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=anthropic uv run python
 | 10 | MCP | FastMCP server와 stdio client로 tool/resource/prompt를 호출합니다. |
 | 11 | ReAct Agent | reasoning/action/observation loop를 LangGraph로 실행합니다. |
 | 12 | GraphTool | DevOps triage LangGraph를 tool로 감싸 ReAct Agent가 호출합니다. |
+| 13 | Human-in-the-loop | incident action 실행 전 interrupt approval gate를 둡니다. |
 
 자세한 chapter별 목표, 핵심 개념, 실행 명령, 테스트 명령은 [Chapter Guide](guides/chapters.md)에서 원하는 chapter 문서로 이동해 확인합니다.
 
@@ -107,6 +109,7 @@ testdata/docs/ch09-rag/   # RAG용 local 문서
 - MCP: `FastMCP` server와 stdio client session으로 tool/resource/prompt를 노출하고 호출합니다.
 - ReAct Agent: LangGraph loop로 reasoning, action, observation, final answer를 연결합니다.
 - GraphTool: deterministic LangGraph workflow를 `StructuredTool`로 감싸 agent action으로 호출합니다.
+- Human-in-the-loop: LangGraph `interrupt`와 `Command(resume=...)`로 action 전 approval gate를 관찰합니다.
 
 ## CLI Output
 
@@ -123,9 +126,10 @@ testdata/docs/ch09-rag/   # RAG용 local 문서
 uv run python examples/ch09_rag.py --verbose "Chapter 8 callback은 RAG에서 어떤 흐름을 관찰하나요?"
 uv run python examples/ch11_react_agent.py --verbose "12 * (7 + 3)"
 uv run python examples/ch12_graphtool.py --verbose "triage checkout 500 errors increased in prod"
+uv run python examples/ch13_human_in_loop.py --verbose "triage checkout 500 errors increased in prod"
 ```
 
-`--verbose` 출력에는 learning goal, 실행 흐름, prompt messages, tool calls, graph route, stream chunks, callback events, MCP call trace, ReAct steps, GraphTool observation이 포함됩니다.
+`--verbose` 출력에는 learning goal, 실행 흐름, prompt messages, tool calls, graph route, stream chunks, callback events, MCP call trace, ReAct steps, GraphTool observation, HITL interrupt/resume trace가 포함됩니다.
 
 ## Environment
 
@@ -171,7 +175,7 @@ RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=anthropic uv run pytest
 ## Documentation
 
 - [Chapter Guide](guides/chapters.md): chapter별 상세 문서 인덱스
-- [Chapter Details](guides/chapters/): Chapter 01-12 상세 학습 목표, 실행 명령, 테스트 명령
+- [Chapter Details](guides/chapters/): Chapter 01-13 상세 학습 목표, 실행 명령, 테스트 명령
 - [Learning Roadmap](docs/learning-roadmap.md): 학습 순서와 다음 확장 후보
 - [Project Guide](guides/project.md): 소스 구조와 파일 배치 기준
 - [Workflow](guides/workflow.md): 개발/검증 루프
@@ -185,3 +189,4 @@ RUN_AGENT_LEARNING_INTEGRATION=1 AGENT_LEARNING_PROVIDER=anthropic uv run pytest
 - Chapter 10은 배포용 remote connector가 아니라 local stdio MCP 학습 예제입니다.
 - Chapter 11은 fake mode가 기본이며, opt-in으로 OpenAI 또는 Anthropic 실제 모델 ReAct 예시를 실행할 수 있습니다.
 - Chapter 12는 fake mode가 기본이며, DevOps triage graph를 ReAct Agent의 tool action으로 호출합니다.
+- Chapter 13은 local HITL approval gate이며, incident decision만 기록하고 production action은 실행하지 않습니다.

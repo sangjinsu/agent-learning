@@ -9,6 +9,7 @@
 - Chapter 10은 local `stdio` transport로 MCP server process와 client session을 함께 실행합니다.
 - Chapter 11은 `llm_call -> tool_node -> llm_call` LangGraph loop로 ReAct 흐름을 보여줍니다.
 - Chapter 12는 `Agent -> GraphTool -> Graph nodes -> JSON observation -> Agent final answer` 흐름을 보여줍니다.
+- Chapter 13은 `interrupt payload -> human decision -> Command resume -> approved/rejected result` 흐름을 보여줍니다.
 
 ```mermaid
 flowchart LR
@@ -16,6 +17,14 @@ flowchart LR
     TOOL --> GRAPH["LangGraph DevOps triage"]
     GRAPH --> JSON["JSON observation"]
     JSON --> AGENT
+```
+
+```mermaid
+flowchart LR
+    GATE["approval_gate"] --> INTERRUPT["interrupt payload"]
+    INTERRUPT --> HUMAN["human decision"]
+    HUMAN --> RESUME["Command resume"]
+    RESUME --> RESULT["approved/rejected result"]
 ```
 
 ## Documentation Notes
@@ -29,3 +38,4 @@ flowchart LR
 - 외부 API 호출은 `RUN_AGENT_LEARNING_INTEGRATION=1` 명시 opt-in일 때만 실행합니다.
 - 출력에는 API key 값을 포함하지 않습니다.
 - 위험한 shell/filesystem/deployment tool은 학습용 tool calling chapter에 등록하지 않습니다.
+- Chapter 13 Human-in-the-loop은 decision만 기록하고 paging, rollback, deployment action은 실행하지 않습니다.
