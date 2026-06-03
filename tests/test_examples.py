@@ -57,6 +57,13 @@ def test_all_examples_print_concise_output_by_default():
             "steps:",
             "final answer:",
         ],
+        "ch13_human_in_loop.py": [
+            "human-in-the-loop:",
+            "mode:",
+            "decision:",
+            "status:",
+            "final answer:",
+        ],
     }
 
     friendly_sections = [
@@ -102,6 +109,13 @@ def test_all_examples_preserve_detailed_learning_trace_with_verbose():
         "ch10_mcp.py": ["mcp call trace:", "available tools:", "tool result:", "final answer:"],
         "ch11_react_agent.py": ["graph nodes:", "react steps:", "observation:", "final answer:"],
         "ch12_graphtool.py": ["graph nodes:", "tool schema:", "react steps:", "observation:", "final answer:"],
+        "ch13_human_in_loop.py": [
+            "graph nodes:",
+            "interrupt payload:",
+            "resume command:",
+            "approval trace:",
+            "final answer:",
+        ],
     }
 
     friendly_sections = [
